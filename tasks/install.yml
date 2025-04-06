@@ -33,6 +33,29 @@
     force_source: "{{ anki_container_image_force_pull if ansible_version.major > 2 or ansible_version.minor >= 8 else omit }}"
     force: "{{ omit if ansible_version.major > 2 or ansible_version.minor >= 8 else anki_container_image_force_pull }}"
 
+- name: Ensure Anki repository is present on self-build
+  ansible.builtin.git:
+    repo: "{{ anki_container_repo }}"
+    version: "{{ anki_container_repo_version }}"
+    dest: "{{ anki_container_src_files_path }}"
+    force: "yes"
+  register: anki_git_pull_results
+  when: "anki_container_image_self_build | bool"
+
+- name: Ensure Anki image is built
+  community.docker.docker_image:
+    name: "{{ anki_container_image_name }}"
+    source: build
+    force_source: "{{ anki_git_pull_results.changed if ansible_version.major > 2 or ansible_version.minor >= 8 else omit }}"
+    force: "{{ omit if ansible_version.major > 2 or ansible_version.minor >= 8 else matrix_mailer_git_pull_results.changed }}"
+    build:
+      dockerfile: docs/syncserver/Dockerfile
+      path: "{{ anki_container_src_files_path }}"
+      pull: true
+      args:
+        ANKI_VERSION: "{{ anki_version }}"
+  when: "anki_container_image_self_build | bool"
+
 - name: Ensure Anki container network is created
   community.general.docker_network:
     enable_ipv6: "{{ devture_systemd_docker_base_ipv6_enabled }}"
