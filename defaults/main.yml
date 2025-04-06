@@ -7,16 +7,14 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-# Project source code URL: https://github.com/timvisee/anki
+# Project source code URL: https://github.com/ankitects/anki
 
 anki_enabled: true
 
 anki_identifier: anki
 anki_base_path: "{{ anki_identifier }}"
 
-# There are version tags, but use "latest" for now, as it contains some
-# fixes which are yet to be released for tagged images.
-anki_version: latest
+anki_version: 25.02
 
 anki_uid: ''
 anki_gid: ''
@@ -24,7 +22,6 @@ anki_gid: ''
 # The hostname at which Anki is served.
 anki_hostname: ''
 
-# Specify URI scheme for anki_environment_variable_base_url.
 anki_scheme: https
 
 # The path at which Anki is exposed.
@@ -34,11 +31,11 @@ anki_scheme: https
 # technical limitations.
 anki_path_prefix: /
 
-anki_container_image: "{{ anki_container_image_registry_prefix }}timvisee/anki:{{ anki_container_image_tag }}"
+anki_container_image: "{{ anki_container_image_registry_prefix }}luckyturtledev/anki:{{ anki_container_image_tag }}"
 anki_container_image_tag: "{{ anki_version }}"
 anki_container_image_registry_prefix: "{{ anki_container_image_registry_prefix_upstream }}"
 anki_container_image_registry_prefix_upstream: "{{ anki_container_image_registry_prefix_upstream_default }}"
-anki_container_image_registry_prefix_upstream_default: registry.gitlab.com/
+anki_container_image_registry_prefix_upstream_default: ghcr.io/
 anki_container_image_force_pull: "{{ anki_container_image.endswith(':latest') }}"
 
 # Controls whether the container exposes its HTTP port (tcp/80 in the container).
@@ -48,6 +45,9 @@ anki_container_http_host_bind_port: ''
 
 # The base container network. It will be auto-created by this role if it doesn't exist already.
 anki_container_network: "{{ anki_identifier }}"
+
+# The port number in the container
+anki_container_http_port: 8080
 
 # A list of additional container networks that the container would be connected to.
 # The role does not create these networks, so make sure they already exist.
@@ -160,70 +160,8 @@ anki_systemd_required_services_list_custom: []
 # List of systemd services that the Anki systemd service wants
 anki_systemd_wanted_services_list: []
 
-# Control storage backend options
-# Also see: https://github.com/timvisee/anki/blob/master/docs/docker.md#storage-backend-options
-#
-# Valid values: localsystem (default), s3compatible, gcs
-anki_storage_backend_option: localsystem
-
-# env.j2: Server configuration
-#
-# Set the HTTPS URL where traffic will be served
-anki_environment_variable_base_url: "{{ anki_scheme }}://{{ anki_hostname }}"
-# Control whether the base URL is detected automatically using browser if anki_environment_variable_base_url is unset
-anki_environment_variable_detect_base_url: false
-# Set the port number on which the server will listen
-anki_environment_variable_port: 1443
-# Control whether Anki is run on `development` mode (unsafe) or `production` mode
-anki_environment_variable_node_env: production
-# Set a URL to a contact page for DMCA requests
-anki_environment_variable_anki_footer_dmca_url: ''
-# Set a Sentry Client ID and DSN for error tracking
-anki_environment_variable_sentry_client: ''
-anki_environment_variable_sentry_dsn: ''
-
-# env.j2: Upload and Download Limits
-#
-# Set the maximum upload file size in bytes (defaults to 2GB)
-anki_environment_variable_max_file_size: 2147483648
-# Set the maximum number of files per archive
-anki_environment_variable_max_files_per_archive: 64
-# Set the maximum upload expiry time in seconds (defaults to 7 days)
-anki_environment_variable_max_expire_seconds: 604800
-# Set the maximum number of downloads
-anki_environment_variable_max_downloads: 20
-# Set expiration time options to show on UI dropdown
-anki_environment_variable_expire_times_seconds: 300, 3600, 86400, {{ anki_environment_variable_max_expire_seconds }}
-# Set download limit options to show on UI dropdown
-anki_environment_variable_download_counts: 1, 2, 3, 4, 5, {{ anki_environment_variable_max_downloads }}
-# Set the default download limit displayed on UI
-anki_environment_variable_default_downloads: '1'
-# Set the default expiration time displayed on UI
-anki_environment_variable_default_expire_seconds: '86400'
-
-# env.j2: Storage Backend Options
-#
-# Set a hostname, port, and pass of the Redis, KeyDB, or Valkey server
-anki_environment_variable_redis_host: ''
-anki_environment_variable_redis_port: 6379
-anki_environment_variable_redis_user: ''
-anki_environment_variable_redis_password: ''
-anki_environment_variable_redis_db: ''
-# Set a directory for storage inside the Docker container
-anki_environment_variable_file_dir: /uploads
-# Set a S3 bucket name to use
-anki_environment_variable_S3_bucket: ''
-# Set a custom endpoint to use for S3 (defaults to AWS; set if using a S3 compatible storage like Wasabi and Storj)
-anki_environment_variable_S3_endpoint: ''
-# Control whether to force path style URLs (https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#s3ForcePathStyle-property) for S3 objects
-anki_environment_variable_S3_use_path_style_endpoint: false
-# Set a S3 access key ID
-anki_environment_variable_aws_access_key_id: ''
-# Set a S3 secret access key ID
-anki_environment_variable_aws_secret_access_key: ''
-# Set a Google Cloud Storage bucket
-anki_environment_variable_gcs_bucket: ''
+anki_environment_variables_username: ''
+anki_environment_variables_password: 'some-password'
 
 # Additional environment variables.
-# See: https://github.com/timvisee/anki/blob/master/server/config.js
 anki_environment_variables_additional_variables: ''

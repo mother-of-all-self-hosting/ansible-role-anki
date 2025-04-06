@@ -3,7 +3,7 @@ galaxy_info:
   company: progressiv
   role_name: anki
   namespace: progressiv
-  description: Anki by Tim Visée
+  description: Anki Sync Server
   platforms:
     - name: Debian
       versions:

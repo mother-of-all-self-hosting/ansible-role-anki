@@ -5,9 +5,9 @@ SPDX-FileCopyrightText: 2025 Suguru Hirahara
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
-# Anki Ansible role
+# Anki synchronization server Ansible role
 
-This is an [Ansible](https://www.ansible.com/) role which installs [Anki](https://github.com/timvisee/anki) to run as a [Docker](https://www.docker.com/) container wrapped in a systemd service.
+This is an [Ansible](https://www.ansible.com/) role which installs [a synchronization server](https://github.com/ankitects/anki/tree/main/docs/syncserver) for [Anki](https://apps.ankiweb.net) to run as a [Docker](https://www.docker.com/) container wrapped in a systemd service.
 
 This role *implicitly* depends on:
 

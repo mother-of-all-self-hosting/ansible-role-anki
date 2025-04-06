@@ -46,7 +46,7 @@ traefik.http.routers.{{ anki_identifier }}.tls={{ anki_container_labels_traefik_
 traefik.http.routers.{{ anki_identifier }}.tls.certResolver={{ anki_container_labels_traefik_tls_certResolver }}
 {% endif %}
 
-traefik.http.services.{{ anki_identifier }}.loadbalancer.server.port={{ anki_environment_variable_port }}
+traefik.http.services.{{ anki_identifier }}.loadbalancer.server.port={{ anki_container_http_port }}
 {% endif %}
 
 {{ anki_container_labels_additional_labels }}

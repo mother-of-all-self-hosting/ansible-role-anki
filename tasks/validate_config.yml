@@ -16,7 +16,6 @@
     - anki_hostname
     - anki_path_prefix
     - anki_container_network
-    - anki_environment_variable_redis_host
 
 - when: anki_container_labels_traefik_enabled | bool
   block:
