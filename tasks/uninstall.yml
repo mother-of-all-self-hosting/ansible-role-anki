@@ -7,24 +7,24 @@
 
 - name: Check existence of Anki systemd service
   ansible.builtin.stat:
-    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ send_identifier }}.service"
-  register: send_service_stat
+    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ anki_identifier }}.service"
+  register: anki_service_stat
 
-- when: send_service_stat.stat.exists | bool
+- when: anki_service_stat.stat.exists | bool
   block:
     - name: Ensure Anki systemd service is stopped
       ansible.builtin.service:
-        name: "{{ send_identifier }}"
+        name: "{{ anki_identifier }}"
         state: stopped
         enabled: false
         daemon_reload: true
 
     - name: Ensure Anki systemd service doesn't exist
       ansible.builtin.file:
-        path: "{{ devture_systemd_docker_base_systemd_path }}/{{ send_identifier }}.service"
+        path: "{{ devture_systemd_docker_base_systemd_path }}/{{ anki_identifier }}.service"
         state: absent
 
     - name: Ensure Anki base directory doesn't exist
       ansible.builtin.file:
-        path: "{{ send_base_path }}"
+        path: "{{ anki_base_path }}"
         state: absent

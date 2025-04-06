@@ -7,102 +7,102 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-# Project source code URL: https://github.com/timvisee/send
+# Project source code URL: https://github.com/timvisee/anki
 
-send_enabled: true
+anki_enabled: true
 
-send_identifier: send
-send_base_path: "{{ send_identifier }}"
+anki_identifier: anki
+anki_base_path: "{{ anki_identifier }}"
 
 # There are version tags, but use "latest" for now, as it contains some
 # fixes which are yet to be released for tagged images.
-send_version: latest
+anki_version: latest
 
-send_uid: ''
-send_gid: ''
+anki_uid: ''
+anki_gid: ''
 
 # The hostname at which Anki is served.
-send_hostname: ''
+anki_hostname: ''
 
-# Specify URI scheme for send_environment_variable_base_url.
-send_scheme: https
+# Specify URI scheme for anki_environment_variable_base_url.
+anki_scheme: https
 
 # The path at which Anki is exposed.
-# This value must either be `/` or not end with a slash (e.g. `/send`).
+# This value must either be `/` or not end with a slash (e.g. `/anki`).
 #
 # Hosting Anki under a subpath does not seem to be possible due to Anki's
 # technical limitations.
-send_path_prefix: /
+anki_path_prefix: /
 
-send_container_image: "{{ send_container_image_registry_prefix }}timvisee/send:{{ send_container_image_tag }}"
-send_container_image_tag: "{{ send_version }}"
-send_container_image_registry_prefix: "{{ send_container_image_registry_prefix_upstream }}"
-send_container_image_registry_prefix_upstream: "{{ send_container_image_registry_prefix_upstream_default }}"
-send_container_image_registry_prefix_upstream_default: registry.gitlab.com/
-send_container_image_force_pull: "{{ send_container_image.endswith(':latest') }}"
+anki_container_image: "{{ anki_container_image_registry_prefix }}timvisee/anki:{{ anki_container_image_tag }}"
+anki_container_image_tag: "{{ anki_version }}"
+anki_container_image_registry_prefix: "{{ anki_container_image_registry_prefix_upstream }}"
+anki_container_image_registry_prefix_upstream: "{{ anki_container_image_registry_prefix_upstream_default }}"
+anki_container_image_registry_prefix_upstream_default: registry.gitlab.com/
+anki_container_image_force_pull: "{{ anki_container_image.endswith(':latest') }}"
 
 # Controls whether the container exposes its HTTP port (tcp/80 in the container).
 #
 # Takes an "<ip>:<port>" or "<port>" value (e.g. "127.0.0.1:2586"), or empty string to not expose.
-send_container_http_host_bind_port: ''
+anki_container_http_host_bind_port: ''
 
 # The base container network. It will be auto-created by this role if it doesn't exist already.
-send_container_network: "{{ send_identifier }}"
+anki_container_network: "{{ anki_identifier }}"
 
 # A list of additional container networks that the container would be connected to.
 # The role does not create these networks, so make sure they already exist.
 # Use this to expose this container to another reverse proxy, which runs in a different container network.
-send_container_additional_networks: "{{ send_container_additional_networks_auto + send_container_additional_networks_custom }}"
-send_container_additional_networks_auto: []
-send_container_additional_networks_custom: []
+anki_container_additional_networks: "{{ anki_container_additional_networks_auto + anki_container_additional_networks_custom }}"
+anki_container_additional_networks_auto: []
+anki_container_additional_networks_custom: []
 
 # A list of additional "volumes" to mount in the container.
 # This list gets populated dynamically at runtime. You can provide a different default value,
 # if you wish to mount your own files into the container.
 # Contains definition objects like this: `{"type": "bind", "src": "/outside", "dst": "/inside", "options": "readonly"}.
 # See the `--mount` documentation for the `docker run` command.
-send_container_additional_volumes: []
+anki_container_additional_volumes: []
 
-# send_container_labels_traefik_enabled controls whether labels to assist a Traefik reverse-proxy will be attached to the container.
+# anki_container_labels_traefik_enabled controls whether labels to assist a Traefik reverse-proxy will be attached to the container.
 # See `../templates/labels.j2` for details.
 #
-# To inject your own other container labels, see `send_container_labels_additional_labels`.
-send_container_labels_traefik_enabled: true
-send_container_labels_traefik_docker_network: "{{ send_container_network }}"
-send_container_labels_traefik_hostname: "{{ send_hostname }}"
-# The path prefix must either be `/` or not end with a slash (e.g. `/send`).
-send_container_labels_traefik_path_prefix: "{{ send_path_prefix }}"
-send_container_labels_traefik_rule: "Host(`{{ send_container_labels_traefik_hostname }}`){% if send_container_labels_traefik_path_prefix != '/' %} && PathPrefix(`{{ send_container_labels_traefik_path_prefix }}`){% endif %}"
-send_container_labels_traefik_priority: 0
-send_container_labels_traefik_entrypoints: web-secure
-send_container_labels_traefik_tls: "{{ send_container_labels_traefik_entrypoints != 'web' }}"
-send_container_labels_traefik_tls_certResolver: default  # noqa var-naming
+# To inject your own other container labels, see `anki_container_labels_additional_labels`.
+anki_container_labels_traefik_enabled: true
+anki_container_labels_traefik_docker_network: "{{ anki_container_network }}"
+anki_container_labels_traefik_hostname: "{{ anki_hostname }}"
+# The path prefix must either be `/` or not end with a slash (e.g. `/anki`).
+anki_container_labels_traefik_path_prefix: "{{ anki_path_prefix }}"
+anki_container_labels_traefik_rule: "Host(`{{ anki_container_labels_traefik_hostname }}`){% if anki_container_labels_traefik_path_prefix != '/' %} && PathPrefix(`{{ anki_container_labels_traefik_path_prefix }}`){% endif %}"
+anki_container_labels_traefik_priority: 0
+anki_container_labels_traefik_entrypoints: web-secure
+anki_container_labels_traefik_tls: "{{ anki_container_labels_traefik_entrypoints != 'web' }}"
+anki_container_labels_traefik_tls_certResolver: default  # noqa var-naming
 
 # Controls which additional headers to attach to all HTTP responses.
-# To add your own custom response headers, use `send_container_labels_traefik_additional_response_headers_custom`
-send_container_labels_traefik_additional_response_headers: "{{ send_container_labels_traefik_additional_response_headers_auto | combine(send_container_labels_traefik_additional_response_headers_custom) }}"
-send_container_labels_traefik_additional_response_headers_auto: |
+# To add your own custom response headers, use `anki_container_labels_traefik_additional_response_headers_custom`
+anki_container_labels_traefik_additional_response_headers: "{{ anki_container_labels_traefik_additional_response_headers_auto | combine(anki_container_labels_traefik_additional_response_headers_custom) }}"
+anki_container_labels_traefik_additional_response_headers_auto: |
   {{
     {}
-    | combine ({'X-XSS-Protection': send_http_header_xss_protection} if send_http_header_xss_protection else {})
-    | combine ({'X-Content-Type-Options': send_http_header_content_type_options} if send_http_header_content_type_options else {})
-    | combine ({'Content-Security-Policy': send_http_header_content_security_policy} if send_http_header_content_security_policy else {})
-    | combine ({'Permission-Policy': send_http_header_content_permission_policy} if send_http_header_content_permission_policy else {})
-    | combine ({'Strict-Transport-Security': send_http_header_strict_transport_security} if send_http_header_strict_transport_security and send_container_labels_traefik_tls else {})
+    | combine ({'X-XSS-Protection': anki_http_header_xss_protection} if anki_http_header_xss_protection else {})
+    | combine ({'X-Content-Type-Options': anki_http_header_content_type_options} if anki_http_header_content_type_options else {})
+    | combine ({'Content-Security-Policy': anki_http_header_content_security_policy} if anki_http_header_content_security_policy else {})
+    | combine ({'Permission-Policy': anki_http_header_content_permission_policy} if anki_http_header_content_permission_policy else {})
+    | combine ({'Strict-Transport-Security': anki_http_header_strict_transport_security} if anki_http_header_strict_transport_security and anki_container_labels_traefik_tls else {})
   }}
-send_container_labels_traefik_additional_response_headers_custom: {}
+anki_container_labels_traefik_additional_response_headers_custom: {}
 
-# send_container_labels_additional_labels contains a multiline string with additional labels to add to the container label file.
+# anki_container_labels_additional_labels contains a multiline string with additional labels to add to the container label file.
 # See `../templates/labels.j2` for details.
 #
 # Example:
-# send_container_labels_additional_labels: |
+# anki_container_labels_additional_labels: |
 #   my.label=1
 #   another.label="here"
-send_container_labels_additional_labels: ''
+anki_container_labels_additional_labels: ''
 
 # A list of extra arguments to pass to the container (`docker run` command)
-send_container_extra_arguments: []
+anki_container_extra_arguments: []
 
 # Specifies the value of the `X-XSS-Protection` header
 # Stops pages from loading when they detect reflected cross-site scripting (XSS) attacks.
@@ -110,23 +110,23 @@ send_container_extra_arguments: []
 # Learn more about it is here:
 # - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
 # - https://portswigger.net/web-security/cross-site-scripting/reflected
-send_http_header_xss_protection: "1; mode=block"
+anki_http_header_xss_protection: "1; mode=block"
 
 # Specifies the value of the `X-Content-Type-Options` header.
 # See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options
-send_http_header_content_type_options: nosniff
+anki_http_header_content_type_options: nosniff
 
 # Specifies the value of the `Content-Security-Policy` header.
 # See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
-send_http_header_content_security_policy: frame-ancestors 'self'
+anki_http_header_content_security_policy: frame-ancestors 'self'
 
 # Specifies the value of the `Permission-Policy` header.
 # See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permission-Policy
-send_http_header_content_permission_policy: "{{ 'interest-cohort=()' if send_floc_optout_enabled else '' }}"
+anki_http_header_content_permission_policy: "{{ 'interest-cohort=()' if anki_floc_optout_enabled else '' }}"
 
 # Specifies the value of the `Strict-Transport-Security` header.
 # See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
-send_http_header_strict_transport_security: "max-age=31536000; includeSubDomains{{ '; preload' if send_hsts_preload_enabled else '' }}"
+anki_http_header_strict_transport_security: "max-age=31536000; includeSubDomains{{ '; preload' if anki_hsts_preload_enabled else '' }}"
 
 # Controls whether to send a "Permissions-Policy interest-cohort=();" header along with all responses
 #
@@ -136,8 +136,8 @@ send_http_header_strict_transport_security: "max-age=31536000; includeSubDomains
 # - https://amifloced.org/
 #
 # Of course, a better solution is to just stop using browsers (like Chrome), which participate in such tracking practices.
-# See: `send_content_permission_policy`
-send_floc_optout_enabled: true
+# See: `anki_content_permission_policy`
+anki_floc_optout_enabled: true
 
 # Controls if HSTS preloading is enabled
 #
@@ -148,82 +148,82 @@ send_floc_optout_enabled: true
 # - https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security
 # - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
 # - https://hstspreload.org/#opt-in
-# See: `send_http_header_strict_transport_security`
-send_hsts_preload_enabled: false
+# See: `anki_http_header_strict_transport_security`
+anki_hsts_preload_enabled: false
 
 # List of systemd services that the Anki systemd service depends on
-send_systemd_required_services_list: "{{ send_systemd_required_services_list_default + send_systemd_required_services_list_auto + send_systemd_required_services_list_custom }}"
-send_systemd_required_services_list_default: "{{ [devture_systemd_docker_base_docker_service_name] if devture_systemd_docker_base_docker_service_name else [] }}"
-send_systemd_required_services_list_auto: []
-send_systemd_required_services_list_custom: []
+anki_systemd_required_services_list: "{{ anki_systemd_required_services_list_default + anki_systemd_required_services_list_auto + anki_systemd_required_services_list_custom }}"
+anki_systemd_required_services_list_default: "{{ [devture_systemd_docker_base_docker_service_name] if devture_systemd_docker_base_docker_service_name else [] }}"
+anki_systemd_required_services_list_auto: []
+anki_systemd_required_services_list_custom: []
 
 # List of systemd services that the Anki systemd service wants
-send_systemd_wanted_services_list: []
+anki_systemd_wanted_services_list: []
 
 # Control storage backend options
-# Also see: https://github.com/timvisee/send/blob/master/docs/docker.md#storage-backend-options
+# Also see: https://github.com/timvisee/anki/blob/master/docs/docker.md#storage-backend-options
 #
 # Valid values: localsystem (default), s3compatible, gcs
-send_storage_backend_option: localsystem
+anki_storage_backend_option: localsystem
 
 # env.j2: Server configuration
 #
 # Set the HTTPS URL where traffic will be served
-send_environment_variable_base_url: "{{ send_scheme }}://{{ send_hostname }}"
-# Control whether the base URL is detected automatically using browser if send_environment_variable_base_url is unset
-send_environment_variable_detect_base_url: false
+anki_environment_variable_base_url: "{{ anki_scheme }}://{{ anki_hostname }}"
+# Control whether the base URL is detected automatically using browser if anki_environment_variable_base_url is unset
+anki_environment_variable_detect_base_url: false
 # Set the port number on which the server will listen
-send_environment_variable_port: 1443
+anki_environment_variable_port: 1443
 # Control whether Anki is run on `development` mode (unsafe) or `production` mode
-send_environment_variable_node_env: production
+anki_environment_variable_node_env: production
 # Set a URL to a contact page for DMCA requests
-send_environment_variable_send_footer_dmca_url: ''
+anki_environment_variable_anki_footer_dmca_url: ''
 # Set a Sentry Client ID and DSN for error tracking
-send_environment_variable_sentry_client: ''
-send_environment_variable_sentry_dsn: ''
+anki_environment_variable_sentry_client: ''
+anki_environment_variable_sentry_dsn: ''
 
 # env.j2: Upload and Download Limits
 #
 # Set the maximum upload file size in bytes (defaults to 2GB)
-send_environment_variable_max_file_size: 2147483648
+anki_environment_variable_max_file_size: 2147483648
 # Set the maximum number of files per archive
-send_environment_variable_max_files_per_archive: 64
+anki_environment_variable_max_files_per_archive: 64
 # Set the maximum upload expiry time in seconds (defaults to 7 days)
-send_environment_variable_max_expire_seconds: 604800
+anki_environment_variable_max_expire_seconds: 604800
 # Set the maximum number of downloads
-send_environment_variable_max_downloads: 20
+anki_environment_variable_max_downloads: 20
 # Set expiration time options to show on UI dropdown
-send_environment_variable_expire_times_seconds: 300, 3600, 86400, {{ send_environment_variable_max_expire_seconds }}
+anki_environment_variable_expire_times_seconds: 300, 3600, 86400, {{ anki_environment_variable_max_expire_seconds }}
 # Set download limit options to show on UI dropdown
-send_environment_variable_download_counts: 1, 2, 3, 4, 5, {{ send_environment_variable_max_downloads }}
+anki_environment_variable_download_counts: 1, 2, 3, 4, 5, {{ anki_environment_variable_max_downloads }}
 # Set the default download limit displayed on UI
-send_environment_variable_default_downloads: '1'
+anki_environment_variable_default_downloads: '1'
 # Set the default expiration time displayed on UI
-send_environment_variable_default_expire_seconds: '86400'
+anki_environment_variable_default_expire_seconds: '86400'
 
 # env.j2: Storage Backend Options
 #
 # Set a hostname, port, and pass of the Redis, KeyDB, or Valkey server
-send_environment_variable_redis_host: ''
-send_environment_variable_redis_port: 6379
-send_environment_variable_redis_user: ''
-send_environment_variable_redis_password: ''
-send_environment_variable_redis_db: ''
+anki_environment_variable_redis_host: ''
+anki_environment_variable_redis_port: 6379
+anki_environment_variable_redis_user: ''
+anki_environment_variable_redis_password: ''
+anki_environment_variable_redis_db: ''
 # Set a directory for storage inside the Docker container
-send_environment_variable_file_dir: /uploads
+anki_environment_variable_file_dir: /uploads
 # Set a S3 bucket name to use
-send_environment_variable_S3_bucket: ''
+anki_environment_variable_S3_bucket: ''
 # Set a custom endpoint to use for S3 (defaults to AWS; set if using a S3 compatible storage like Wasabi and Storj)
-send_environment_variable_S3_endpoint: ''
+anki_environment_variable_S3_endpoint: ''
 # Control whether to force path style URLs (https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#s3ForcePathStyle-property) for S3 objects
-send_environment_variable_S3_use_path_style_endpoint: false
+anki_environment_variable_S3_use_path_style_endpoint: false
 # Set a S3 access key ID
-send_environment_variable_aws_access_key_id: ''
+anki_environment_variable_aws_access_key_id: ''
 # Set a S3 secret access key ID
-send_environment_variable_aws_secret_access_key: ''
+anki_environment_variable_aws_secret_access_key: ''
 # Set a Google Cloud Storage bucket
-send_environment_variable_gcs_bucket: ''
+anki_environment_variable_gcs_bucket: ''
 
 # Additional environment variables.
-# See: https://github.com/timvisee/send/blob/master/server/config.js
-send_environment_variables_additional_variables: ''
+# See: https://github.com/timvisee/anki/blob/master/server/config.js
+anki_environment_variables_additional_variables: ''

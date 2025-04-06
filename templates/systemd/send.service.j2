@@ -8,12 +8,12 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 #jinja2: lstrip_blocks: "True"
 [Unit]
-Description=Anki ({{ send_identifier }})
-{% for service in send_systemd_required_services_list %}
+Description=Anki ({{ anki_identifier }})
+{% for service in anki_systemd_required_services_list %}
 Requires={{ service }}
 After={{ service }}
 {% endfor %}
-{% for service in send_systemd_wanted_services_list %}
+{% for service in anki_systemd_wanted_services_list %}
 Wants={{ service }}
 {% endfor %}
 DefaultDependencies=no
@@ -21,42 +21,42 @@ DefaultDependencies=no
 [Service]
 Type=simple
 Environment="HOME={{ devture_systemd_docker_base_systemd_unit_home_path }}"
-ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ send_identifier }} 2>/dev/null || true'
-ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ send_identifier }} 2>/dev/null || true'
+ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ anki_identifier }} 2>/dev/null || true'
+ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ anki_identifier }} 2>/dev/null || true'
 
 ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       --rm \
-      --name={{ send_identifier }} \
+      --name={{ anki_identifier }} \
       --log-driver=none \
-      --user={{ send_uid }}:{{ send_gid }} \
+      --user={{ anki_uid }}:{{ anki_gid }} \
       --cap-drop=ALL \
       --read-only \
-      --network={{ send_container_network }} \
-      {% if send_container_http_host_bind_port %}
-      -p {{ send_container_http_host_bind_port }}:{{ send_environment_variable_port }} \
+      --network={{ anki_container_network }} \
+      {% if anki_container_http_host_bind_port %}
+      -p {{ anki_container_http_host_bind_port }}:{{ anki_environment_variable_port }} \
       {% endif %}
-      --env-file={{ send_base_path }}/env \
-      --label-file={{ send_base_path }}/labels \
-      {% for volume in send_container_additional_volumes %}
+      --env-file={{ anki_base_path }}/env \
+      --label-file={{ anki_base_path }}/labels \
+      {% for volume in anki_container_additional_volumes %}
       --mount type={{ volume.type | default('bind' if '/' in volume.src else 'volume') }},src={{ volume.src }},dst={{ volume.dst }}{{ (',' + volume.options) if volume.options else '' }} \
       {% endfor %}
-      {% for arg in send_container_extra_arguments %}
+      {% for arg in anki_container_extra_arguments %}
       {{ arg }} \
       {% endfor %}
-      {{ send_container_image }}
+      {{ anki_container_image }}
 
-{% for network in send_container_additional_networks %}
-ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network connect {{ network }} {{ send_identifier }}
+{% for network in anki_container_additional_networks %}
+ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network connect {{ network }} {{ anki_identifier }}
 {% endfor %}
 
-ExecStart={{ devture_systemd_docker_base_host_command_docker }} start --attach {{ send_identifier }}
+ExecStart={{ devture_systemd_docker_base_host_command_docker }} start --attach {{ anki_identifier }}
 
-ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ send_identifier }} 2>/dev/null || true'
-ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ send_identifier }} 2>/dev/null || true'
+ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ anki_identifier }} 2>/dev/null || true'
+ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ anki_identifier }} 2>/dev/null || true'
 
 Restart=always
 RestartSec=30
-SyslogIdentifier={{ send_identifier }}
+SyslogIdentifier={{ anki_identifier }}
 
 [Install]
 WantedBy=multi-user.target

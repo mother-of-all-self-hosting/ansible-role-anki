@@ -1,7 +1,7 @@
 galaxy_info:
   author: Suguru Hirahara
   company: progressiv
-  role_name: send
+  role_name: anki
   namespace: progressiv
   description: Anki by Tim Visée
   platforms:

@@ -6,21 +6,21 @@
 ---
 
 - block:
-    - when: send_enabled | bool
+    - when: anki_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/validate_config.yml"
 
-    - when: send_enabled | bool
+    - when: anki_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/install.yml"
 
   tags:
     - setup-all
-    - setup-send
+    - setup-anki
     - install-all
-    - install-send
+    - install-anki
 
 - block:
-    - when: not send_enabled | bool
+    - when: not anki_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/uninstall.yml"
   tags:
     - setup-all
-    - setup-send
+    - setup-anki
