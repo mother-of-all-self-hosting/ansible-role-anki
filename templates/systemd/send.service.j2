@@ -8,7 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 #jinja2: lstrip_blocks: "True"
 [Unit]
-Description=Send ({{ send_identifier }})
+Description=Anki ({{ send_identifier }})
 {% for service in send_systemd_required_services_list %}
 Requires={{ service }}
 After={{ service }}

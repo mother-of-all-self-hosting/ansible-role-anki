@@ -21,16 +21,16 @@ send_version: latest
 send_uid: ''
 send_gid: ''
 
-# The hostname at which Send is served.
+# The hostname at which Anki is served.
 send_hostname: ''
 
 # Specify URI scheme for send_environment_variable_base_url.
 send_scheme: https
 
-# The path at which Send is exposed.
+# The path at which Anki is exposed.
 # This value must either be `/` or not end with a slash (e.g. `/send`).
 #
-# Hosting Send under a subpath does not seem to be possible due to Send's
+# Hosting Anki under a subpath does not seem to be possible due to Anki's
 # technical limitations.
 send_path_prefix: /
 
@@ -151,13 +151,13 @@ send_floc_optout_enabled: true
 # See: `send_http_header_strict_transport_security`
 send_hsts_preload_enabled: false
 
-# List of systemd services that the Send systemd service depends on
+# List of systemd services that the Anki systemd service depends on
 send_systemd_required_services_list: "{{ send_systemd_required_services_list_default + send_systemd_required_services_list_auto + send_systemd_required_services_list_custom }}"
 send_systemd_required_services_list_default: "{{ [devture_systemd_docker_base_docker_service_name] if devture_systemd_docker_base_docker_service_name else [] }}"
 send_systemd_required_services_list_auto: []
 send_systemd_required_services_list_custom: []
 
-# List of systemd services that the Send systemd service wants
+# List of systemd services that the Anki systemd service wants
 send_systemd_wanted_services_list: []
 
 # Control storage backend options
@@ -174,7 +174,7 @@ send_environment_variable_base_url: "{{ send_scheme }}://{{ send_hostname }}"
 send_environment_variable_detect_base_url: false
 # Set the port number on which the server will listen
 send_environment_variable_port: 1443
-# Control whether Send is run on `development` mode (unsafe) or `production` mode
+# Control whether Anki is run on `development` mode (unsafe) or `production` mode
 send_environment_variable_node_env: production
 # Set a URL to a contact page for DMCA requests
 send_environment_variable_send_footer_dmca_url: ''

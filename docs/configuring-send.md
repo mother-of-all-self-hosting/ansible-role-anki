@@ -16,23 +16,23 @@ SPDX-FileCopyrightText: 2024 - 2025 Suguru Hirahara
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
-# Setting up Send
+# Setting up Anki
 
-This is an [Ansible](https://www.ansible.com/) role which installs [Send](https://github.com/timvisee/send) to run as a [Docker](https://www.docker.com/) container wrapped in a systemd service.
+This is an [Ansible](https://www.ansible.com/) role which installs [Anki](https://github.com/timvisee/send) to run as a [Docker](https://www.docker.com/) container wrapped in a systemd service.
 
-Send is a fork of Mozilla's discontinued [Firefox Send](https://github.com/mozilla/send) which allows you to send files to others with a link. Files are end-to-end encrypted so they cannot be read by the server, and also can be protected with a password.
+Anki is a fork of Mozilla's discontinued [Firefox Anki](https://github.com/mozilla/send) which allows you to send files to others with a link. Files are end-to-end encrypted so they cannot be read by the server, and also can be protected with a password.
 
-See the project's [documentation](https://github.com/timvisee/send/blob/master/README.md) to learn what Send does and why it might be useful to you.
+See the project's [documentation](https://github.com/timvisee/send/blob/master/README.md) to learn what Anki does and why it might be useful to you.
 
 ## Prerequisites
 
-To run a Send instance it is necessary to prepare a [Redis](https://redis.io/) server for managing a metadata database.
+To run a Anki instance it is necessary to prepare a [Redis](https://redis.io/) server for managing a metadata database.
 
 If you are looking for an Ansible role for Redis, you can check out [this role (ansible-role-redis)](https://github.com/mother-of-all-self-hosting/ansible-role-redis) maintained by the [Mother-of-All-Self-Hosting (MASH)](https://github.com/mother-of-all-self-hosting) team. Note that the team recommends to have a look at [this role (ansible-role-valkey)](https://github.com/mother-of-all-self-hosting/ansible-role-valkey) for [Valkey](https://valkey.io/) instead.
 
 ## Adjusting the playbook configuration
 
-To enable Send with this role, add the following configuration to your `vars.yml` file.
+To enable Anki with this role, add the following configuration to your `vars.yml` file.
 
 **Note**: the path should be something like `inventory/host_vars/mash.example.com/vars.yml` if you use the [MASH Ansible playbook](https://github.com/mother-of-all-self-hosting/mash-playbook).
 
@@ -54,7 +54,7 @@ send_enabled: true
 
 ### Set the hostname
 
-To enable the Send you need to set the hostname as well. To do so, add the following configuration to your `vars.yml` file. Make sure to replace `example.com` with your own value.
+To enable the Anki you need to set the hostname as well. To do so, add the following configuration to your `vars.yml` file. Make sure to replace `example.com` with your own value.
 
 ```yaml
 send_hostname: "example.com"
@@ -62,13 +62,13 @@ send_hostname: "example.com"
 
 After adjusting the hostname, make sure to adjust your DNS records to point the domain to your server.
 
-**Note**: hosting Send under a subpath (by configuring the `send_path_prefix` variable) does not seem to be possible due to Send's technical limitations.
+**Note**: hosting Anki under a subpath (by configuring the `send_path_prefix` variable) does not seem to be possible due to Anki's technical limitations.
 
 ### Set variables for connecting to a Redis server
 
-As described above, it is necessary to set up a [Redis](https://redis.io/) server for managing a metadata database of a Send instance. You can use either KeyDB or Valkey alternatively.
+As described above, it is necessary to set up a [Redis](https://redis.io/) server for managing a metadata database of a Anki instance. You can use either KeyDB or Valkey alternatively.
 
-Having configured it, you need to add and adjust the following configuration to your `vars.yml` file, so that  the Send instance will connect to the server:
+Having configured it, you need to add and adjust the following configuration to your `vars.yml` file, so that  the Anki instance will connect to the server:
 
 ```yaml
 send_environment_variable_redis_host: YOUR_REDIS_SERVER_HOSTNAME_HERE
@@ -78,7 +78,7 @@ send_environment_variable_redis_password: ''
 send_environment_variable_redis_db: ''
 ```
 
-Make sure to replace `YOUR_REDIS_SERVER_HOSTNAME_HERE` with the hostname of your Redis server. If the Redis server runs on the same host as Send, set `localhost`.
+Make sure to replace `YOUR_REDIS_SERVER_HOSTNAME_HERE` with the hostname of your Redis server. If the Redis server runs on the same host as Anki, set `localhost`.
 
 ### Configure a storage backend
 
@@ -188,7 +188,7 @@ Take a look at:
 
 - [`defaults/main.yml`](../defaults/main.yml) for some variables that you can customize via your `vars.yml` file. You can override settings (even those that don't have dedicated playbook variables) using the `send_environment_variables_additional_variables` variable
 
-For a complete list of Send's config options that you could put in `send_environment_variables_additional_variables`, see its [environment variables](https://github.com/timvisee/send/blob/master/docs/docker.md#environment-variables).
+For a complete list of Anki's config options that you could put in `send_environment_variables_additional_variables`, see its [environment variables](https://github.com/timvisee/send/blob/master/docs/docker.md#environment-variables).
 
 ## Installing
 
@@ -202,7 +202,7 @@ If you use the MASH playbook, the shortcut commands with the [`just` program](ht
 
 ## Usage
 
-Send should be available at the specified hostname like `https://example.com`.
+Anki should be available at the specified hostname like `https://example.com`.
 
 It can be used via [CLI client](https://github.com/timvisee/ffsend). With the client you can upload a file specifying your host with `--host` option as below:
 
@@ -229,7 +229,7 @@ When a DMCA compliant was submitted or an abuse was detected, you need to remove
    redis-cli DEL fa04ec7f8ce1bc05
    ```
 
-   If you run a Redis, KeyDB, or Valkey server on a Docker container along with the contaiener for Send on the same server, you can directly run the command with `docker exec`:
+   If you run a Redis, KeyDB, or Valkey server on a Docker container along with the contaiener for Anki on the same server, you can directly run the command with `docker exec`:
 
    ```sh
    docker exec -it YOUR_CONTAINER_FOR_REDIS_HERE sh -c "redis-cli DEL fa04ec7f8ce1bc05"

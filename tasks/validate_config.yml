@@ -5,7 +5,7 @@
 
 ---
 
-- name: Fail if required Send settings not defined
+- name: Fail if required Anki settings not defined
   ansible.builtin.fail:
     msg: >
       You need to define a required configuration setting (`{{ item }}`).
@@ -20,7 +20,7 @@
 
 - when: send_container_labels_traefik_enabled | bool
   block:
-    - name: Fail if required Send Traefik settings not defined
+    - name: Fail if required Anki Traefik settings not defined
       ansible.builtin.fail:
         msg: >-
           You need to define a required configuration setting (`{{ item }}`).

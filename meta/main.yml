@@ -3,7 +3,7 @@ galaxy_info:
   company: progressiv
   role_name: send
   namespace: progressiv
-  description: Send by Tim Visée
+  description: Anki by Tim Visée
   platforms:
     - name: Debian
       versions:
