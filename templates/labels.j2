@@ -1,0 +1,52 @@
+{#
+SPDX-FileCopyrightText: 2023 Slavi Pantaleev
+SPDX-FileCopyrightText: 2025 Suguru Hirahara
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+#}
+
+{% if send_container_labels_traefik_enabled %}
+traefik.enable=true
+
+{% if send_container_labels_traefik_docker_network %}
+traefik.docker.network={{ send_container_labels_traefik_docker_network }}
+{% endif %}
+
+{% set middlewares = [] %}
+
+{% if send_container_labels_traefik_path_prefix != '/' %}
+traefik.http.middlewares.{{ send_identifier }}-slashless-redirect.redirectregex.regex=({{ send_container_labels_traefik_path_prefix | quote }})$
+traefik.http.middlewares.{{ send_identifier }}-slashless-redirect.redirectregex.replacement=${1}/
+{% set middlewares = middlewares + [send_identifier + '-slashless-redirect'] %}
+{% endif %}
+
+{% if send_container_labels_traefik_path_prefix != '/' %}
+traefik.http.middlewares.{{ send_identifier }}-strip-prefix.stripprefix.prefixes={{ send_container_labels_traefik_path_prefix }}
+{% set middlewares = middlewares + [send_identifier + '-strip-prefix'] %}
+{% endif %}
+
+{% if send_container_labels_traefik_additional_response_headers.keys() | length > 0 %}
+{% for name, value in send_container_labels_traefik_additional_response_headers.items() %}
+traefik.http.middlewares.{{ send_identifier }}-add-headers.headers.customresponseheaders.{{ name }}={{ value }}
+{% endfor %}
+{% set middlewares = middlewares + [send_identifier + '-add-headers'] %}
+{% endif %}
+
+traefik.http.routers.{{ send_identifier }}.rule={{ send_container_labels_traefik_rule }}
+{% if send_container_labels_traefik_priority | int > 0 %}
+traefik.http.routers.{{ send_identifier }}.priority={{ send_container_labels_traefik_priority }}
+{% endif %}
+traefik.http.routers.{{ send_identifier }}.service={{ send_identifier }}
+{% if middlewares | length > 0 %}
+traefik.http.routers.{{ send_identifier }}.middlewares={{ middlewares | join(',') }}
+{% endif %}
+traefik.http.routers.{{ send_identifier }}.entrypoints={{ send_container_labels_traefik_entrypoints }}
+traefik.http.routers.{{ send_identifier }}.tls={{ send_container_labels_traefik_tls | to_json }}
+{% if send_container_labels_traefik_tls %}
+traefik.http.routers.{{ send_identifier }}.tls.certResolver={{ send_container_labels_traefik_tls_certResolver }}
+{% endif %}
+
+traefik.http.services.{{ send_identifier }}.loadbalancer.server.port={{ send_environment_variable_port }}
+{% endif %}
+
+{{ send_container_labels_additional_labels }}

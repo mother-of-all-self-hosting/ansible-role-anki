@@ -1,0 +1,21 @@
+galaxy_info:
+  author: Suguru Hirahara
+  company: progressiv
+  role_name: send
+  namespace: progressiv
+  description: Send by Tim Visée
+  platforms:
+    - name: Debian
+      versions:
+        - all
+    - name: Ubuntu
+      versions:
+        - all
+    - name: Archlinux
+      versions:
+        - all
+    - name: EL
+      versions:
+        - 7
+  license: AGPL-3.0-or-later
+  min_ansible_version: '2.1'
