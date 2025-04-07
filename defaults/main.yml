@@ -19,15 +19,15 @@ anki_version: 25.02
 anki_uid: ''
 anki_gid: ''
 
-# The hostname at which Anki is served.
+# The hostname at which Anki synchronization server is served.
 anki_hostname: ''
 
 anki_scheme: https
 
-# The path at which Anki is exposed.
+# The path at which Anki synchronization server is exposed.
 # This value must either be `/` or not end with a slash (e.g. `/anki`).
 #
-# Hosting Anki under a subpath does not seem to be possible due to Anki's
+# Hosting Anki synchronization server under a subpath does not seem to be possible due to Anki's
 # technical limitations.
 anki_path_prefix: /
 
@@ -157,13 +157,13 @@ anki_floc_optout_enabled: true
 # See: `anki_http_header_strict_transport_security`
 anki_hsts_preload_enabled: false
 
-# List of systemd services that the Anki systemd service depends on
+# List of systemd services that the Anki synchronization server systemd service depends on
 anki_systemd_required_services_list: "{{ anki_systemd_required_services_list_default + anki_systemd_required_services_list_auto + anki_systemd_required_services_list_custom }}"
 anki_systemd_required_services_list_default: "{{ [devture_systemd_docker_base_docker_service_name] if devture_systemd_docker_base_docker_service_name else [] }}"
 anki_systemd_required_services_list_auto: []
 anki_systemd_required_services_list_custom: []
 
-# List of systemd services that the Anki systemd service wants
+# List of systemd services that the Anki synchronization server systemd service wants
 anki_systemd_wanted_services_list: []
 
 anki_environment_variables_username: ''

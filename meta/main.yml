@@ -3,7 +3,7 @@ galaxy_info:
   company: progressiv
   role_name: anki
   namespace: progressiv
-  description: Anki Sync Server
+  description: Anki synchronization server
   platforms:
     - name: Debian
       versions:
