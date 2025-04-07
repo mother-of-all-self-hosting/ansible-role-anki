@@ -40,7 +40,11 @@ anki_container_image_force_pull: "{{ anki_container_image.endswith(':latest') }}
 
 anki_container_image_self_build: false
 anki_container_image_name: "ankitects/anki:{{ anki_container_image_tag }}"
+
+# Note this is a repository of not only Anki's synchronization server but also Anki's
+# shared backend and web components, and the Qt frontend.
 anki_container_repo: "https://github.com/ankitects/anki.git"
+
 anki_container_repo_version: "{{ anki_version if anki_version != 'latest' else 'main' }}"
 anki_container_src_files_path: "{{ anki_base_path }}/docker-src"
 

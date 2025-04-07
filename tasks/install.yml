@@ -33,7 +33,7 @@
     force_source: "{{ anki_container_image_force_pull if ansible_version.major > 2 or ansible_version.minor >= 8 else omit }}"
     force: "{{ omit if ansible_version.major > 2 or ansible_version.minor >= 8 else anki_container_image_force_pull }}"
 
-- name: Ensure Anki synchronization server repository is present on self-build
+- name: Ensure Anki repository is present on self-build
   ansible.builtin.git:
     repo: "{{ anki_container_repo }}"
     version: "{{ anki_container_repo_version }}"
