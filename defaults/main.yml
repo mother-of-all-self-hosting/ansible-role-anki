@@ -26,9 +26,6 @@ anki_scheme: https
 
 # The path at which Anki synchronization server is exposed.
 # This value must either be `/` or not end with a slash (e.g. `/anki`).
-#
-# Hosting Anki synchronization server under a subpath does not seem to be possible due to Anki's
-# technical limitations.
 anki_path_prefix: /
 
 anki_container_image: "{{ anki_container_image_registry_prefix }}luckyturtledev/anki:{{ anki_container_image_tag }}"

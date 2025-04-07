@@ -60,8 +60,6 @@ anki_hostname: "example.com"
 
 After adjusting the hostname, make sure to adjust your DNS records to point the domain to your server.
 
-**Note**: hosting Anki synchronization server under a subpath (by configuring the `anki_path_prefix` variable) does not seem to be possible due to Anki's technical limitations.
-
 ### Mount a directory for storing data
 
 The service requires a Docker volume to be mounted, so that the directory for storing files is shared with the host machine.
