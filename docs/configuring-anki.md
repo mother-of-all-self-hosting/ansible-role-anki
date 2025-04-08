@@ -62,6 +62,17 @@ anki_hostname: "example.com"
 
 After adjusting the hostname, make sure to adjust your DNS records to point the domain to your server.
 
+### Set the username and password
+
+You also need to create a user to log in to the instance with a client application. To create one, add the following configuration to your `vars.yml` file. Make sure to replace `YOUR_USERNAME_HERE` and `YOUR_PASSWORD_HERE`.
+
+```yaml
+anki_environment_variables_username: YOUR_USERNAME_HERE
+anki_environment_variables_password: YOUR_PASSWORD_HERE
+```
+
+**Note**: if the username is changed after creating the user, a new user with the specified username will be created by running the installation command, instead of renaming the user.
+
 ### Mount a directory for storing data
 
 The service requires a Docker volume to be mounted, so that the directory for storing files is shared with the host machine.

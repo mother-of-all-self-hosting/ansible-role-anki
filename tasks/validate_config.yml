@@ -16,6 +16,8 @@
     - anki_hostname
     - anki_path_prefix
     - anki_container_network
+    - anki_environment_variables_username
+    - anki_environment_variables_password
 
 - when: anki_container_labels_traefik_enabled | bool
   block:
