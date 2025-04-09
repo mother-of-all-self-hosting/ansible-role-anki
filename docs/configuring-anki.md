@@ -24,6 +24,8 @@ Anki is a flashcard program that helps you spend more time on challenging materi
 
 See the project's [documentation](https://docs.ankiweb.net/sync-server.html) to learn what the synchronization server does and why it might be useful to you.
 
+✨ Anki (暗記) means "Memorize" in Japanese.
+
 >[!NOTE]
 >
 > This role is configured to use [this pre-built Docker image](https://github.com/luckyturtledev/docker-images/pkgs/container/anki) by default. While the image itself is unofficial, it contains the official synchronization server. See [Dockerfile](https://github.com/LuckyTurtleDev/docker-images/blob/main/dockerfiles/anki/Dockerfile) by the author and [this summary](https://github.com/truecharts/public/issues/17318#issue-2092096085) for (a bit complicated) history behind the Docker image.
