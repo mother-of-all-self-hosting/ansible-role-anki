@@ -5,11 +5,11 @@
 
 ---
 
-- name: Ensure Anki synchronization server paths exist
+- name: Ensure Anki synchronization server path exists
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    mode: "0750"
+    mode: 0750
     owner: "{{ anki_uid }}"
     group: "{{ anki_gid }}"
   with_items:
@@ -19,7 +19,7 @@
   ansible.builtin.template:
     src: "{{ role_path }}/templates/{{ item }}.j2"
     dest: "{{ anki_base_path }}/{{ item }}"
-    mode: "0640"
+    mode: 0640
     owner: "{{ anki_uid }}"
     group: "{{ anki_gid }}"
   with_items:
@@ -67,4 +67,4 @@
   ansible.builtin.template:
     src: "{{ role_path }}/templates/systemd/anki.service.j2"
     dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ anki_identifier }}.service"
-    mode: "0644"
+    mode: 0644
