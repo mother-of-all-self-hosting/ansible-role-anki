@@ -19,12 +19,12 @@
         enabled: false
         daemon_reload: true
 
-    - name: Ensure Anki synchronization server systemd service doesn't exist
+    - name: Ensure Anki synchronization server systemd service does not exist
       ansible.builtin.file:
         path: "{{ devture_systemd_docker_base_systemd_path }}/{{ anki_identifier }}.service"
         state: absent
 
-    - name: Ensure Anki synchronization server base directory doesn't exist
+    - name: Ensure Anki synchronization server path does not exist
       ansible.builtin.file:
         path: "{{ anki_base_path }}"
         state: absent
