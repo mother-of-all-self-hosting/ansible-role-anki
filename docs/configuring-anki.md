@@ -97,7 +97,7 @@ Take a look at:
 
 - [`defaults/main.yml`](../defaults/main.yml) for some variables that you can customize via your `vars.yml` file. You can override settings (even those that don't have dedicated playbook variables) using the `anki_environment_variables_additional_variables` variable
 
-See [here](https://github.com/LuckyTurtleDev/docker-images/blob/main/dockerfiles/anki/README.md) for a complete list of the server's config options that you could put in `anki_environment_variables_additional_variables`.
+See [the documentation by the Docker image provider](https://github.com/LuckyTurtleDev/docker-images/blob/main/dockerfiles/anki/README.md) for a complete list of the server's config options that you could put in `anki_environment_variables_additional_variables`.
 
 ## Installing
 
@@ -113,7 +113,7 @@ If you use the MASH playbook, the shortcut commands with the [`just` program](ht
 
 After running the command for installation, the synchronization server becomes available at the specified hostname like `https://example.com`.
 
-If using a reverse proxy to provide HTTPS access and serving the instance under a subpath, make sure to include a trailing slash when configuring Anki. See [here](https://docs.ankiweb.net/sync-server.html#reverse-proxies) for more information.
+If using a reverse proxy to provide HTTPS access and serving the instance under a subpath, make sure to include a trailing slash when configuring Anki. See [this section on the official documentation](https://docs.ankiweb.net/sync-server.html#reverse-proxies) for details.
 
 ## Troubleshooting
 

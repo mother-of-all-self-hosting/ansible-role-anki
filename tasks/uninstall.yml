@@ -4,13 +4,13 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-
 - name: Check existence of Anki synchronization server systemd service
   ansible.builtin.stat:
     path: "{{ devture_systemd_docker_base_systemd_path }}/{{ anki_identifier }}.service"
   register: anki_service_stat
 
-- when: anki_service_stat.stat.exists | bool
+- name: Uninstall Anki synchronization server systemd services and files
+  when: anki_service_stat.stat.exists | bool
   block:
     - name: Ensure Anki synchronization server systemd service is stopped
       ansible.builtin.service:

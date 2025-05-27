@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-
 - name: Fail if required Anki synchronization server settings not defined
   ansible.builtin.fail:
     msg: >
@@ -19,7 +18,8 @@
     - anki_environment_variables_username
     - anki_environment_variables_password
 
-- when: anki_container_labels_traefik_enabled | bool
+- name: Run if Traefik is enabled
+  when: anki_container_labels_traefik_enabled | bool
   block:
     - name: Fail if required Anki synchronization server Traefik settings not defined
       ansible.builtin.fail:
