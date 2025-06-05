@@ -31,33 +31,35 @@
     source: "{{ 'pull' if ansible_version.major > 2 or ansible_version.minor > 7 else omit }}"
     force_source: "{{ anki_container_image_force_pull if ansible_version.major > 2 or ansible_version.minor >= 8 else omit }}"
     force: "{{ omit if ansible_version.major > 2 or ansible_version.minor >= 8 else anki_container_image_force_pull }}"
+  when: "not anki_container_image_self_build | bool"
   register: result
   retries: "{{ devture_playbook_help_container_retries_count }}"
   delay: "{{ devture_playbook_help_container_retries_delay }}"
   until: result is not failed
 
-- name: Ensure Anki repository is present on self-build
-  ansible.builtin.git:
-    repo: "{{ anki_container_repo }}"
-    version: "{{ anki_container_repo_version }}"
-    dest: "{{ anki_container_src_files_path }}"
-    force: "yes"
-  register: anki_git_pull_results
+- name: Run if self-building of Anki synchronization server container image is enabled
   when: "anki_container_image_self_build | bool"
+  block:
+    - name: Ensure Anki synchronization server repository is present on self-build
+      ansible.builtin.git:
+        repo: "{{ anki_container_repo }}"
+        version: "{{ anki_container_repo_version }}"
+        dest: "{{ anki_container_src_files_path }}"
+        force: "yes"
+      register: anki_git_pull_results
 
-- name: Ensure Anki synchronization server image is built
-  community.docker.docker_image:
-    name: "{{ anki_container_image_name }}"
-    source: build
-    force_source: "{{ anki_git_pull_results.changed if ansible_version.major > 2 or ansible_version.minor >= 8 else omit }}"
-    force: "{{ omit if ansible_version.major > 2 or ansible_version.minor >= 8 else matrix_mailer_git_pull_results.changed }}"
-    build:
-      dockerfile: docs/syncserver/Dockerfile
-      path: "{{ anki_container_src_files_path }}"
-      pull: true
-      args:
-        ANKI_VERSION: "{{ anki_version }}"
-  when: "anki_container_image_self_build | bool"
+    - name: Ensure Anki synchronization server container image is built
+      community.docker.docker_image:
+        name: "{{ anki_container_image_name }}"
+        source: build
+        force_source: "{{ anki_git_pull_results.changed if ansible_version.major > 2 or ansible_version.minor >= 8 else omit }}"
+        force: "{{ omit if ansible_version.major > 2 or ansible_version.minor >= 8 else anki_git_pull_results.changed }}"
+        build:
+          dockerfile: docs/syncserver/Dockerfile
+          path: "{{ anki_container_src_files_path }}"
+          pull: true
+          args:
+            ANKI_VERSION: "{{ anki_version }}"
 
 - name: Ensure Anki synchronization server container network is created
   community.general.docker_network:
