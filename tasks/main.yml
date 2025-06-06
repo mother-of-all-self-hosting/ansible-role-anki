@@ -5,6 +5,7 @@
 
 ---
 - name: Perform Anki synchronization server installation tasks
+  when: anki_enabled | bool
   tags:
     - setup-all
     - setup-anki
@@ -12,17 +13,15 @@
     - install-anki
   block:
     - name: Validate Anki synchronization server configuration
-      when: anki_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/validate_config.yml"
     - name: Install Anki synchronization server
-      when: anki_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/install.yml"
 
 - name: Perform Anki synchronization server uninstallation tasks
+  when: not anki_enabled | bool
   tags:
     - setup-all
     - setup-anki
   block:
     - name: Uninstall Anki synchronization server
-      when: not anki_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/uninstall.yml"
