@@ -37,7 +37,7 @@ anki_container_image_registry_prefix_upstream_default: ghcr.io/
 anki_container_image_force_pull: "{{ anki_container_image.endswith(':latest') }}"
 
 anki_container_image_self_build: false
-anki_container_image_name: "ankitects/anki:{{ anki_container_image_tag }}"
+anki_container_image_name: "ankitects/anki:{{ anki_container_repo_version }}"
 
 # Note this is a repository of not only Anki's synchronization server but also Anki's
 # shared backend and web components, and the Qt frontend.
