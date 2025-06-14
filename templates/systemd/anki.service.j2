@@ -42,7 +42,7 @@ ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       {% for arg in anki_container_extra_arguments %}
       {{ arg }} \
       {% endfor %}
-      {{ anki_container_image }}
+      {{ anki_container_image_self_build_name if anki_container_image_self_build else anki_container_image }}
 
 {% for network in anki_container_additional_networks %}
 ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network connect {{ network }} {{ anki_identifier }}
