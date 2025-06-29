@@ -7,6 +7,14 @@
   "labels": [
     "dependencies"
   ],
+  "packageRules": [
+    {
+      "matchPackageNames": ["/pre-commit-hooks/"],
+      "enabled": true,
+      "automerge": true,
+      "automergeType": "pr"
+    }
+  ],
   "customManagers": [
     {
       "customType": "regex",
