@@ -9,6 +9,12 @@
   ],
   "packageRules": [
     {
+      "matchPackageNames": ["/ansible-lint/"],
+      "enabled": true,
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
       "matchPackageNames": ["/pre-commit-hooks/"],
       "enabled": true,
       "automerge": true,
