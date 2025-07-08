@@ -15,7 +15,7 @@ anki_identifier: anki
 anki_base_path: "/{{ anki_identifier }}"
 
 # renovate: datasource=docker depName=ghcr.io/luckyturtledev/anki
-anki_version: 25.07.1
+anki_version: 25.07.2
 
 anki_uid: ''
 anki_gid: ''
