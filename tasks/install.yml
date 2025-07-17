@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-- name: Ensure Anki synchronization server path exists
+- name: Ensure Anki synchronization server paths exist
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -13,6 +13,7 @@
     group: "{{ anki_gid }}"
   with_items:
     - "{{ anki_base_path }}"
+    - "{{ anki_data_path }}"
 
 - name: Ensure Anki synchronization server support files installed
   ansible.builtin.template:
