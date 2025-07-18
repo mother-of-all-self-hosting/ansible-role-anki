@@ -61,6 +61,6 @@
         devture_playbook_runtime_messages_list | default([])
         +
         [
-          "Note: As a local Anki synchronization server instance has been removed, some old data remains in `{{ anki_data_path }}`. Feel free to delete it."
+          "Note: As the local Anki synchronization server instance has been removed, some old data remains in `{{ anki_data_path }}`. Feel free to delete it."
         ]
       }}
