@@ -32,6 +32,11 @@
         - env
         - labels
 
+    - name: Ensure Anki synchronization server image source files path does not exist
+      ansible.builtin.file:
+        path: "{{ anki_container_image_self_build_src_files_path }}"
+        state: absent
+
     - name: Ensure Anki synchronization server container network does not exist via community.docker.docker_network
       when: devture_systemd_docker_base_container_network_creation_method == 'ansible-module'
       community.docker.docker_network:
