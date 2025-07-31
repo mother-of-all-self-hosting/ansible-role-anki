@@ -21,7 +21,7 @@
 - name: Run if Traefik is enabled
   when: anki_container_labels_traefik_enabled | bool
   block:
-    - name: Fail if required Anki synchronization server Traefik settings not defined
+    - name: Fail if Traefik settings required for Anki synchronization server are not defined
       ansible.builtin.fail:
         msg: >-
           You need to define a required configuration setting (`{{ item }}`).
