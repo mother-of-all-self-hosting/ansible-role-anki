@@ -52,6 +52,18 @@
       register: network_deletion_result
       changed_when: anki_container_network in network_deletion_result.stdout
 
+    - name: Ensure Anki synchronization server local data path does not exist if empty
+      ansible.builtin.command:
+        cmd: "rmdir {{ anki_data_path }}"
+      register: anki_data_path_deletion_result
+      changed_when: anki_data_path_deletion_result.rc == 0
+
+    - name: Ensure Anki synchronization server base path does not exist if empty
+      ansible.builtin.command:
+        cmd: "rmdir {{ anki_base_path }}"
+      register: anki_base_path_deletion_result
+      changed_when: anki_base_path_deletion_result.rc == 0
+
 - name: Check existence of Anki synchronization server local data path
   ansible.builtin.stat:
     path: "{{ anki_data_path }}"
