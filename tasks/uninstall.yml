@@ -57,12 +57,14 @@
         cmd: "rmdir {{ anki_data_path }}"
       register: anki_data_path_deletion_result
       changed_when: anki_data_path_deletion_result.rc == 0
+      failed_when: false
 
     - name: Ensure Anki synchronization server base path does not exist if empty
       ansible.builtin.command:
         cmd: "rmdir {{ anki_base_path }}"
       register: anki_base_path_deletion_result
       changed_when: anki_base_path_deletion_result.rc == 0
+      failed_when: false
 
 - name: Check existence of Anki synchronization server local data path
   ansible.builtin.stat:
