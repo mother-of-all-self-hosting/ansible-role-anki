@@ -111,9 +111,10 @@ anki_container_labels_traefik_additional_response_headers_custom: {}
 
 # anki_container_labels_additional_labels contains a multiline string with additional labels to add to the container label file.
 # See `../templates/labels.j2` for details.
+# To add your own custom labels, use `anki_container_labels_additional_labels_custom`
 #
 # Example:
-# anki_container_labels_additional_labels: |
+# anki_container_labels_additional_labels_custom: |
 #   my.label=1
 #   another.label="here"
 anki_container_labels_additional_labels: "{{ anki_container_labels_additional_labels_auto | combine(anki_container_labels_additional_labels_custom) }}"
