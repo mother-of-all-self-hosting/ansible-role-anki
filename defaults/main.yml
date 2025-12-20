@@ -180,6 +180,9 @@ anki_systemd_wanted_services_list_default: []
 anki_systemd_wanted_services_list_auto: []
 anki_systemd_wanted_services_list_custom: []
 
+# Specify the timezone
+anki_environment_variables_tz: UTC
+
 anki_environment_variables_username: ""
 anki_environment_variables_password: ""
 
