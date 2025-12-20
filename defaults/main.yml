@@ -116,7 +116,9 @@ anki_container_labels_traefik_additional_response_headers_custom: {}
 # anki_container_labels_additional_labels: |
 #   my.label=1
 #   another.label="here"
-anki_container_labels_additional_labels: ""
+anki_container_labels_additional_labels: "{{ anki_container_labels_additional_labels_auto | combine(anki_container_labels_additional_labels_custom) }}"
+anki_container_labels_additional_labels_auto: {}
+anki_container_labels_additional_labels_custom: {}
 
 # A list of extra arguments to pass to the container (`docker run` command)
 anki_container_extra_arguments: "{{ anki_container_extra_arguments_auto + anki_container_extra_arguments_custom }}"
