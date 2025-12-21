@@ -121,7 +121,7 @@ anki_container_labels_additional_labels: "{{ anki_container_labels_additional_la
 anki_container_labels_additional_labels_auto: {}
 anki_container_labels_additional_labels_custom: {}
 
-# A list of extra arguments to pass to the container (`docker run` command)
+# A list of extra arguments to pass to the container (`docker create` command)
 anki_container_extra_arguments: "{{ anki_container_extra_arguments_auto + anki_container_extra_arguments_custom }}"
 anki_container_extra_arguments_auto: []
 anki_container_extra_arguments_custom: []
