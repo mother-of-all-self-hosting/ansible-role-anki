@@ -26,7 +26,7 @@ anki_hostname: ""
 
 anki_scheme: https
 
-# The path at which Anki synchronization server is exposed.
+# The path at which Anki synchronization server is served.
 # This value must either be `/` or not end with a slash (e.g. `/anki`).
 anki_path_prefix: /
 
