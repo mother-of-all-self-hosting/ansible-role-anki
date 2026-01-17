@@ -48,13 +48,13 @@ anki_container_image_self_build_repo: "https://github.com/ankitects/anki.git"
 anki_container_image_self_build_repo_version: "{{ anki_version if anki_version != 'latest' else 'main' }}"
 anki_container_image_self_build_src_files_path: "{{ anki_base_path }}/docker-src"
 
+# The base container network. It will be auto-created by this role if it doesn't exist already.
+anki_container_network: "{{ anki_identifier }}"
+
 # Controls whether the container exposes its HTTP port (tcp/8080 in the container).
 #
 # Takes an "<ip>:<port>" or "<port>" value (e.g. "127.0.0.1:2586"), or empty string to not expose.
 anki_container_http_host_bind_port: ""
-
-# The base container network. It will be auto-created by this role if it doesn't exist already.
-anki_container_network: "{{ anki_identifier }}"
 
 # The port number in the container
 anki_container_http_port: 8080
