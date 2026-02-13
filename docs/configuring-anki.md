@@ -75,7 +75,7 @@ anki_environment_variables_password: YOUR_PASSWORD_HERE
 
 ### Extending the configuration
 
-There are some additional things you may wish to configure about the component.
+There are some additional things you may wish to configure about the service.
 
 Take a look at:
 
