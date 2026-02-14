@@ -42,6 +42,7 @@
       community.docker.docker_network:
         name: "{{ anki_container_network }}"
         state: absent
+      register: anki_network_deletion_result
 
     - name: Ensure Anki synchronization server container network does not exist via ansible.builtin.command
       when: devture_systemd_docker_base_container_network_creation_method == 'command'
@@ -49,8 +50,8 @@
         cmd: >-
           {{ devture_systemd_docker_base_host_command_docker }} network rm
           {{ anki_container_network }}
-      register: network_deletion_result
-      changed_when: anki_container_network in network_deletion_result.stdout
+      register: anki_network_deletion_result
+      changed_when: anki_container_network in anki_network_deletion_result.stdout
 
     - name: Ensure Anki synchronization server local data path does not exist if empty
       ansible.builtin.command:
