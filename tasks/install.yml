@@ -75,6 +75,7 @@
           pull: true
           args:
             ANKI_VERSION: "{{ anki_version }}"
+      register: anki_container_image_build_result
 
 - name: Ensure Anki synchronization server container network is created via community.docker.docker_network
   when: devture_systemd_docker_base_container_network_creation_method == 'ansible-module'
@@ -110,4 +111,5 @@
         anki_support_files_result.changed | default(false)
         or anki_systemd_service_result.changed | default(false)
         or anki_container_image_pull_result.changed | default(false)
+        or anki_container_image_build_result.changed | default(false)
       }}
