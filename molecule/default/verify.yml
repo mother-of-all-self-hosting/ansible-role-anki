@@ -1,0 +1,58 @@
+# SPDX-FileCopyrightText: 2026 Suguru Hirahara
+# SPDX-FileCopyrightText: 2026 spatterlight
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+---
+- name: Verify Anki synchronization server systemd service
+  hosts: all
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Retrieve Anki synchronization server service log for debugging
+      ansible.builtin.command:
+        cmd: journalctl -xeu anki.service
+      changed_when: false
+
+    - name: Wait for Anki synchronization server service to become active (up to 180s)
+      ansible.builtin.systemd:
+        name: anki.service
+      register: anki_service
+      until: anki_service.status.ActiveState == 'active'
+      retries: 36
+      delay: 5
+
+    - name: Assert Anki synchronization server service is active
+      ansible.builtin.assert:
+        that: anki_service.status.ActiveState == 'active'
+        fail_msg: "anki.service not active ({{ anki_service.status.ActiveState }})"
+        success_msg: "anki.service is active"
+
+    - name: Retrieve Anki synchronization server service log for debugging
+      when: anki_debug_service_enabled | bool
+      ansible.builtin.command:
+        cmd: journalctl -xeu anki.service
+      changed_when: false
+
+    - name: Wait for Anki synchronization server HTTP endpoint to respond (up to 10m)
+      ansible.builtin.uri:
+        url: "http://localhost:8080/health"
+        method: GET
+        status_code: [200, 302]
+        follow_redirects: none
+      register: anki_endpoint
+      until: anki_endpoint.status in [200, 302]
+      retries: 120
+      delay: 5
+
+    - name: Assert Anki synchronization server HTTP endpoint responds
+      ansible.builtin.assert:
+        that: anki_endpoint.status in [200, 302]
+        fail_msg: "Anki synchronization server did not respond as expected ({{ anki_endpoint.status | default('no response') }})"
+        success_msg: "Anki synchronization server responded with {{ anki_endpoint.status }}"
+
+    - name: Show Anki synchronization server systemd service status summary
+      ansible.builtin.debug:
+        msg:
+          - "Anki synchronization server systemd: {{ anki_service.status.ActiveState }}"
+          - "Anki synchronization server HTTP: {{ anki_endpoint.status }}"
