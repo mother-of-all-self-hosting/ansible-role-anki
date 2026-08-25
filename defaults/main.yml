@@ -15,6 +15,11 @@ anki_identifier: anki
 anki_base_path: "/{{ anki_identifier }}"
 anki_data_path: "{{ anki_base_path }}/data"
 
+# The path inside the container that `anki_data_path` is mounted at.
+# The synchronization server keeps one subdirectory per user there (holding
+# `collection.anki2` and the user's media), which is what `SYNC_BASE` points at.
+anki_container_data_path: /data
+
 # renovate: datasource=docker depName=ghcr.io/luckyturtledev/anki
 anki_version: "26.08"
 
