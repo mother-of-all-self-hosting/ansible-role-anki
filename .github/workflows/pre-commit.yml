@@ -6,7 +6,10 @@
 ---
 name: pre-commit
 
-on: [push, pull_request]  # yamllint disable-line rule:truthy
+on:  # yamllint disable-line rule:truthy
+  push:
+  pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -15,6 +18,13 @@ jobs:
   prek:
     name: Run prek hooks
     runs-on: ubuntu-latest
+
+    # Same-repository pull requests already run via the push event;
+    # run pull_request jobs only for pull requests from forks.
+    if: >-
+      github.event_name != 'pull_request'
+      || github.event.pull_request.head.repo.full_name != github.repository
+
     container:
       image: docker.io/archlinux:base-devel
 
