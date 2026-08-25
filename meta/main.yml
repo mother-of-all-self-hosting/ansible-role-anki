@@ -3,7 +3,7 @@ galaxy_info:
   author: Suguru Hirahara
   company: progressiv
   role_name: anki
-  namespace: progressiv
+  namespace: mash
   description: Anki synchronization server
   platforms:
     - name: Debian
