@@ -1,0 +1,77 @@
+# SPDX-FileCopyrightText: 2026 Slavi Pantaleev
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+---
+dependency:
+  name: galaxy
+  options:
+    requirements-file: requirements.yml
+    force: true
+driver:
+  name: docker
+platforms:
+  - name: anki-${MOLECULE_DISTRO:-debian13}-upgrade
+    image: "geerlingguy/docker-${MOLECULE_DISTRO:-debian13}-ansible:latest"
+    command: ${MOLECULE_DOCKER_COMMAND:-""}
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
+    pre_build_image: true
+scenario:
+  # Converging this scenario a second time would reinstall the seed release
+  # before upgrading again, so it changes things by design and there is no
+  # idempotence to check. The `default` scenario is where that is checked.
+  test_sequence:
+    - dependency
+    - cleanup
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    - verify
+    - cleanup
+    - destroy
+provisioner:
+  name: ansible
+  config_options:
+    defaults:
+      callback_result_format: yaml
+  inventory:
+    group_vars:
+      all:
+        # Helper variables
+        anki_debug_service_enabled: false
+
+        # The release the collection is created with, before the role is run
+        # again at the version it pins. An older release than the pinned one is
+        # the point; the verifier refuses to run if the two are equal.
+        anki_molecule_seed_version: 25.09.4
+
+        # Variables for Anki
+        anki_uid: 1000
+        anki_gid: 1000
+        anki_scheme: http
+        anki_hostname: localhost
+        anki_container_labels_traefik_enabled: false
+
+        # Stated rather than derived, so that the verifier can reuse the
+        # environment file the role rendered when it runs the older release
+        # against the upgraded data.
+        anki_base_path: /anki
+
+        anki_data_path: /anki/molecule-data
+        anki_container_data_path: /anki-collections
+
+        anki_container_http_port: 18115
+        anki_container_http_host_bind_port: 127.0.0.1:18115
+
+        anki_environment_variables_username: mash-anki-upgrade
+        anki_environment_variables_password: molecule-upgrade-password
+  env:
+    # Workaround for https://github.com/ansible/molecule/issues/4391
+    ANSIBLE_ROLES_PATH: ${MOLECULE_PROJECT_DIRECTORY}/..:/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:~/.ansible/roles
+verifier:
+  name: ansible

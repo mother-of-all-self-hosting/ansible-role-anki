@@ -1,43 +1,37 @@
-# SPDX-FileCopyrightText: 2026 spatterlight
 # SPDX-FileCopyrightText: 2026 Slavi Pantaleev
-# SPDX-FileCopyrightText: 2026 Suguru Hirahara
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-- name: Prepare Anki synchronization server Molecule tests
+- name: Prepare Anki synchronization server upgrade Molecule tests
   hosts: all
   become: true
   gather_facts: true
   tasks:
-    - name: Ensure apt cache is updated for Anki synchronization server Molecule tests preparation
+    - name: Ensure apt cache is updated for Anki synchronization server upgrade Molecule tests preparation
       ansible.builtin.apt:
         update_cache: true
         cache_valid_time: 600
       when: ansible_facts["os_family"] == 'Debian'
 
-    - name: Ensure required packages are installed for Anki synchronization server Molecule tests preparation
+    - name: Ensure required packages are installed for Anki synchronization server upgrade Molecule tests preparation
       ansible.builtin.package:
         name:
+          # Required by community.docker's modules, which the role uses to pull
+          # the container image.
           - python3-requests
           # The sync protocol compresses request and response bodies with zstd,
           # which the sync probe needs in order to talk to the server.
           - python3-zstandard
         state: present
 
-    - name: Ensure the Anki synchronization server sync probe is installed for Molecule tests preparation
+    - name: Ensure the Anki synchronization server sync probe is installed for upgrade Molecule tests preparation
       ansible.builtin.copy:
         src: "{{ lookup('ansible.builtin.env', 'MOLECULE_PROJECT_DIRECTORY') }}/molecule/sync-probe.py"
         dest: /usr/local/bin/anki-sync-probe
         mode: "0755"
 
-    - name: Ensure the extra volume directory exists for Anki synchronization server Molecule tests preparation
-      ansible.builtin.file:
-        path: "{{ anki_molecule_extra_volume_path_host }}"
-        state: directory
-        mode: "0755"
-
-    - name: Ensure Docker is installed for Anki synchronization server Molecule tests preparation
+    - name: Ensure Docker is installed for Anki synchronization server upgrade Molecule tests preparation
       ansible.builtin.include_role:
         name: ansible-role-docker
       vars:

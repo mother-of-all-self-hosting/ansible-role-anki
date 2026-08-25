@@ -1,0 +1,178 @@
+# SPDX-FileCopyrightText: 2026 Slavi Pantaleev
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+---
+- name: Verify the Anki synchronization server upgrade
+  hosts: all
+  become: true
+  gather_facts: false
+
+  vars:
+    anki_probe_base_url: "http://127.0.0.1:{{ anki_container_http_port }}"
+    anki_collection_path: "{{ anki_data_path }}/{{ anki_environment_variables_username }}/collection.anki2"
+    anki_downgrade_container_name: anki-upgrade-scenario-downgrade-check
+
+  tasks:
+    - name: Read Anki synchronization server role defaults
+      ansible.builtin.include_vars:
+        file: "{{ lookup('ansible.builtin.env', 'MOLECULE_PROJECT_DIRECTORY') }}/defaults/main.yml"
+        name: anki_role_defaults
+
+    # Should the pinned version ever become the seed version, this scenario
+    # would quietly stop testing an upgrade at all.
+    - name: Assert the seed release differs from the pinned release
+      ansible.builtin.assert:
+        that: anki_molecule_seed_version != anki_role_defaults.anki_version
+        fail_msg: "The seed release and the pinned release are both {{ anki_role_defaults.anki_version }}, so no upgrade is being exercised"
+        success_msg: "Upgrading from {{ anki_molecule_seed_version }} to {{ anki_role_defaults.anki_version }}"
+
+    - name: Read what the seed release of Anki synchronization server reported
+      ansible.builtin.slurp:
+        src: /root/anki-seed-probe.json
+      register: anki_seed_probe_raw
+
+    - name: Register what the seed release of Anki synchronization server reported
+      ansible.builtin.set_fact:
+        anki_seed_probe: "{{ anki_seed_probe_raw.content | b64decode | from_json }}"
+
+    - name: Retrieve the Anki synchronization server container's image reference
+      ansible.builtin.command:
+        cmd: docker inspect --format {% raw %}'{{ .Config.Image }}'{% endraw %} anki
+      register: anki_container_image_result
+      changed_when: false
+      retries: 36
+      delay: 5
+      until: anki_container_image_result.rc == 0
+
+    - name: Assert the Anki synchronization server container runs the pinned release
+      ansible.builtin.assert:
+        that: anki_container_image_result.stdout | trim == expected_image
+        fail_msg: "Expected the container to run {{ expected_image }}, found {{ anki_container_image_result.stdout | trim }}"
+        success_msg: "The container runs {{ expected_image }}"
+      vars:
+        expected_image: "ghcr.io/luckyturtledev/anki:{{ anki_role_defaults.anki_version }}"
+
+    # As in the `default` scenario, readiness is only that the server answers,
+    # so that the assertions below fail at their own tasks.
+    - name: Wait for the upgraded Anki synchronization server to answer on the configured port (up to 5m)
+      ansible.builtin.command:
+        cmd: >-
+          /usr/local/bin/anki-sync-probe
+          --base-url {{ anki_probe_base_url }}
+          --username {{ anki_environment_variables_username | quote }}
+          --password {{ anki_environment_variables_password | quote }}
+      register: anki_probe_result
+      changed_when: false
+      retries: 60
+      delay: 5
+      until: anki_probe_result.rc == 0 and (anki_probe_result.stdout | from_json).health_status == 200
+
+    - name: Register the upgraded Anki synchronization server sync probe result
+      ansible.builtin.set_fact:
+        anki_probe: "{{ anki_probe_result.stdout | from_json }}"
+
+    - name: Show what the seed and the pinned releases reported
+      ansible.builtin.debug:
+        msg:
+          - "seed ({{ anki_molecule_seed_version }}): {{ anki_seed_probe }}"
+          - "pinned ({{ anki_role_defaults.anki_version }}): {{ anki_probe }}"
+
+    - name: Assert the upgraded Anki synchronization server still serves the existing collection
+      ansible.builtin.assert:
+        that:
+          - anki_probe.login_status == 200
+          - anki_probe.meta_status == 200
+        fail_msg: "After the upgrade, logging in returned {{ anki_probe.login_status }} and sync/meta returned {{ anki_probe.meta_status }}"
+        success_msg: "The upgraded server still logs the user in and serves collection metadata"
+
+    # `scm` is the timestamp of the last change to the collection's schema. The
+    # collection was created by the seed release; if the pinned release had
+    # migrated it on opening, this is the field that would move, and every
+    # client would be told to resynchronize from scratch.
+    - name: Assert the upgrade did not rewrite the collection's schema
+      ansible.builtin.assert:
+        that: anki_probe.meta.scm == anki_seed_probe.meta.scm
+        fail_msg: "The collection schema timestamp moved from {{ anki_seed_probe.meta.scm }} to {{ anki_probe.meta.scm }} across the upgrade"
+        success_msg: "The collection schema timestamp is unchanged at {{ anki_probe.meta.scm }}"
+
+    - name: Check the Anki synchronization server collection file after the upgrade
+      ansible.builtin.stat:
+        path: "{{ anki_collection_path }}"
+      register: anki_collection_stat
+
+    - name: Assert the collection survived the upgrade in place
+      ansible.builtin.assert:
+        that: anki_collection_stat.stat.exists
+        fail_msg: "No collection at {{ anki_collection_path }} after the upgrade"
+        success_msg: "The collection is still at {{ anki_collection_path }}"
+
+    # Whether an upgrade is one-way decides whether it may ever be automerged.
+    # The only way to find out is to point the older release at the data the
+    # newer one has been serving.
+    - name: Check that the seed release still reads the collection after the upgrade
+      block:
+        - name: Ensure Anki synchronization server is stopped for the downgrade check
+          ansible.builtin.systemd_service:
+            name: anki.service
+            state: stopped
+
+        # The role's own environment file is reused deliberately: the older
+        # release gets exactly the configuration the role produced, including
+        # the port and the data directory.
+        - name: Ensure the seed release of Anki synchronization server is started against the upgraded data
+          ansible.builtin.command:
+            cmd: >-
+              docker run -d --rm
+              --name={{ anki_downgrade_container_name }}
+              --user={{ anki_uid }}:{{ anki_gid }}
+              --cap-drop=ALL
+              --read-only
+              --env-file={{ anki_base_path }}/env
+              -p 127.0.0.1:{{ anki_container_http_port }}:{{ anki_container_http_port }}
+              --mount type=bind,src={{ anki_data_path }},dst={{ anki_container_data_path }}
+              ghcr.io/luckyturtledev/anki:{{ anki_molecule_seed_version }}
+          changed_when: true
+
+        - name: Wait for the seed release of Anki synchronization server to answer on the configured port again (up to 2m)
+          ansible.builtin.command:
+            cmd: >-
+              /usr/local/bin/anki-sync-probe
+              --base-url {{ anki_probe_base_url }}
+              --username {{ anki_environment_variables_username | quote }}
+              --password {{ anki_environment_variables_password | quote }}
+          register: anki_downgrade_probe_result
+          changed_when: false
+          retries: 24
+          delay: 5
+          until: anki_downgrade_probe_result.rc == 0 and (anki_downgrade_probe_result.stdout | from_json).health_status == 200
+
+        - name: Register the downgrade sync probe result
+          ansible.builtin.set_fact:
+            anki_downgrade_probe: "{{ anki_downgrade_probe_result.stdout | from_json }}"
+
+        - name: Assert the seed release still reads the collection the newer release served
+          ansible.builtin.assert:
+            that:
+              - anki_downgrade_probe.meta_status == 200
+              - anki_downgrade_probe.meta.scm == anki_seed_probe.meta.scm
+            fail_msg: "Rolling back to {{ anki_molecule_seed_version }} returned {{ anki_downgrade_probe.meta_status }} with schema timestamp {{ anki_downgrade_probe.meta.scm | default('none') }}"
+            success_msg: "Rolling back to {{ anki_molecule_seed_version }} still reads the collection"
+
+      always:
+        - name: Ensure the downgrade check container is removed
+          ansible.builtin.command:
+            cmd: docker rm -f {{ anki_downgrade_container_name }}
+          changed_when: true
+          failed_when: false
+
+        - name: Ensure Anki synchronization server is started again
+          ansible.builtin.systemd_service:
+            name: anki.service
+            state: started
+
+    - name: Retrieve the Anki synchronization server service log for debugging
+      when: anki_debug_service_enabled | bool
+      ansible.builtin.command:
+        cmd: journalctl -xeu anki.service
+      changed_when: false

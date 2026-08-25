@@ -1,0 +1,84 @@
+# SPDX-FileCopyrightText: 2026 Slavi Pantaleev
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+---
+# A fresh installation cannot say anything about what happens to the collections
+# a server has already been entrusted with. This scenario therefore installs an
+# older release first, syncs against it so that a collection exists on disk, and
+# only then runs the role at the version it pins.
+
+- name: Install the seed release of Anki synchronization server
+  hosts: all
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Include roles for the seed release of Anki synchronization server
+      ansible.builtin.include_role:
+        name: "{{ role_name }}"
+        public: true
+      loop:
+        - com.devture.ansible.role.playbook_help
+        - com.devture.ansible.role.systemd_docker_base
+        - "{{ lookup('ansible.builtin.env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+      loop_control:
+        loop_var: role_name
+      vars:
+        anki_version: "{{ anki_molecule_seed_version }}"
+
+    - name: Ensure systemd daemon is reloaded for the seed release of Anki synchronization server
+      ansible.builtin.systemd_service:
+        daemon_reload: true
+
+    - name: Ensure the seed release of Anki synchronization server is started
+      ansible.builtin.systemd_service:
+        name: anki.service
+        state: started
+
+- name: Create a collection with the seed release of Anki synchronization server
+  hosts: all
+  become: true
+  gather_facts: false
+  tasks:
+    # A metadata request makes the server open, and therefore create, the
+    # collection of the logged-in user.
+    - name: Wait for the seed release of Anki synchronization server to answer a sync client handshake (up to 5m)
+      ansible.builtin.command:
+        cmd: >-
+          /usr/local/bin/anki-sync-probe
+          --base-url http://127.0.0.1:{{ anki_container_http_port }}
+          --username {{ anki_environment_variables_username | quote }}
+          --password {{ anki_environment_variables_password | quote }}
+      register: anki_seed_probe_result
+      changed_when: false
+      retries: 60
+      delay: 5
+      until: anki_seed_probe_result.rc == 0 and (anki_seed_probe_result.stdout | from_json).meta_status == 200
+
+    - name: Record what the seed release of Anki synchronization server reported
+      ansible.builtin.copy:
+        content: "{{ anki_seed_probe_result.stdout }}"
+        dest: /root/anki-seed-probe.json
+        mode: "0600"
+
+- name: Upgrade Anki synchronization server to the pinned release
+  hosts: all
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Include roles for the pinned release of Anki synchronization server
+      ansible.builtin.include_role:
+        name: "{{ role_name }}"
+        public: true
+      loop:
+        - com.devture.ansible.role.playbook_help
+        - com.devture.ansible.role.systemd_docker_base
+        - "{{ lookup('ansible.builtin.env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+      loop_control:
+        loop_var: role_name
+
+    - name: Ensure Anki synchronization server is restarted onto the pinned release
+      ansible.builtin.systemd_service:
+        name: anki.service
+        state: restarted
+        daemon_reload: true

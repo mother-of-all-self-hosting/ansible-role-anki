@@ -1,4 +1,5 @@
 # SPDX-FileCopyrightText: 2026 spatterlight
+# SPDX-FileCopyrightText: 2026 Slavi Pantaleev
 # SPDX-FileCopyrightText: 2026 Suguru Hirahara
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
@@ -31,15 +32,40 @@ provisioner:
         # Helper variables
         anki_debug_service_enabled: false
 
+        # An arbitrary directory mounted into the container next to the data
+        # directory. Its only purpose is to make this scenario configure
+        # `anki_container_additional_volumes_custom`, which used to suppress the
+        # mount of the data directory entirely.
+        anki_molecule_extra_volume_path_host: /anki-molecule-extra
+        anki_molecule_extra_volume_path_container: /extra
+
         # Variables for Anki
         anki_uid: 1000
         anki_gid: 1000
         anki_scheme: http
         anki_hostname: localhost
         anki_container_labels_traefik_enabled: false
-        anki_container_http_host_bind_port: 8080
-        anki_environment_variables_username: username
-        anki_environment_variables_password: password
+
+        # Neither of these is the value the role would have derived or the
+        # server would have defaulted to, so a collection turning up under
+        # `anki_data_path` on the host proves that the bind mount and
+        # `SYNC_BASE` both followed the configuration.
+        anki_data_path: /anki/molecule-data
+        anki_container_data_path: /anki-collections
+
+        # Deliberately not the server's own default of 8080, so that reaching
+        # the server at all proves the role told it which port to listen on.
+        anki_container_http_port: 18114
+        anki_container_http_host_bind_port: 127.0.0.1:18114
+
+        anki_environment_variables_username: mash-anki-probe
+        anki_environment_variables_password: molecule-probe-password
+
+        anki_container_additional_volumes_custom:
+          - type: bind
+            src: "{{ anki_molecule_extra_volume_path_host }}"
+            dst: "{{ anki_molecule_extra_volume_path_container }}"
+            options: readonly
   env:
     # Workaround for https://github.com/ansible/molecule/issues/4391
     ANSIBLE_ROLES_PATH: ${MOLECULE_PROJECT_DIRECTORY}/..:/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:~/.ansible/roles

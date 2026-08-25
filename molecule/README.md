@@ -43,11 +43,25 @@ pip3 install -r ./molecule/requirements.txt
 
 ## Scenarios
 
-Currently there is one testing scenario available.
+There are two testing scenarios available.
 
 ### `default`
 
 Tests a standard Anki synchronization server installation.
+
+The server answers `GET /health` with 200 and an empty body however it is configured, and answers everything else with 404, so neither the systemd unit being active (`Restart=always` keeps a crash-looping container's unit active) nor a health check says much on its own. What this scenario checks instead is the sync protocol itself, with [`sync-probe.py`](./sync-probe.py) sending the same requests an Anki client sends:
+
+- logging in with the configured credentials returns a sync key, while a wrong password, an unknown user and a forged sync key are all rejected with 403
+- a metadata request over the protocol succeeds, which makes the server create the collection of that user, and the collection turns up as an SQLite database under `anki_data_path` on the host
+- the container listens on `anki_container_http_port` rather than on the server's own default, so the probe reaching it at all proves the role's environment file reached the process
+- the container mounts both the data directory and the volume configured via `anki_container_additional_volumes_custom`
+- the container was created from the image tag `anki_version` pins (read out of `defaults/main.yml`, so that it cannot go stale)
+
+### `upgrade`
+
+Tests what happens to a collection which already exists when the role is upgraded.
+
+The role is installed at an older release first and synced against, so that a collection exists on disk; the role is then run again at the version it pins and the service is restarted onto it. The scenario asserts that the upgraded server still logs the user in, still serves the collection, and that the collection's schema timestamp did not move — a schema migration would move it and force every client to resynchronize from scratch. Finally it stops the service, points the older release at the upgraded data, and asserts that it still reads the collection, which is what says the upgrade is not one-way.
 
 ## Running
 
