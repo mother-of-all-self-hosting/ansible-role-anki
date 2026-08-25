@@ -62,11 +62,17 @@
       vars:
         expected_image: "ghcr.io/luckyturtledev/anki:{{ anki_role_defaults.anki_version }}"
 
+    # Retried like the lookup above: a container which cannot start is recreated
+    # every 30 seconds and is absent in between, and this should report what is
+    # wrong with it rather than that it happened to be missing at this instant.
     - name: Retrieve the Anki synchronization server container's mount destinations
       ansible.builtin.command:
         cmd: docker inspect --format {% raw %}'{{ range .Mounts }}{{ .Destination }} {{ end }}'{% endraw %} anki
       register: anki_container_mounts_result
       changed_when: false
+      retries: 36
+      delay: 5
+      until: anki_container_mounts_result.rc == 0
 
     # `anki_container_additional_volumes_custom` used to replace the data
     # directory mount instead of adding to it. This scenario configures one, so
