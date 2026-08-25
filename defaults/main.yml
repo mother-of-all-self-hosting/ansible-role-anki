@@ -27,7 +27,7 @@ anki_container_data_path: /data
 # other two-component tags, and the patch releases of the pinned version stay
 # invisible. See `.github/renovate.json` for the measurements behind this.
 # renovate: datasource=docker depName=ghcr.io/luckyturtledev/anki versioning=loose
-anki_version: "26.08"
+anki_version: "26.08.1"
 
 anki_uid: ""
 anki_gid: ""
