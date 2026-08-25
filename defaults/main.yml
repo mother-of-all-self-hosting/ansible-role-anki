@@ -20,7 +20,13 @@ anki_data_path: "{{ anki_base_path }}/data"
 # `collection.anki2` and the user's media), which is what `SYNC_BASE` points at.
 anki_container_data_path: /data
 
-# renovate: datasource=docker depName=ghcr.io/luckyturtledev/anki
+# The image is tagged with Anki's own `YY.MM[.patch]` version numbers, which are
+# not semver. `versioning=loose` is what lets Renovate compare a two-component
+# release with the three-component patch releases that follow it; with the
+# `docker` versioning it would default to, a pin like `26.08` only ever sees
+# other two-component tags, and the patch releases of the pinned version stay
+# invisible. See `.github/renovate.json` for the measurements behind this.
+# renovate: datasource=docker depName=ghcr.io/luckyturtledev/anki versioning=loose
 anki_version: "26.08"
 
 anki_uid: ""
