@@ -83,6 +83,12 @@ Take a look at:
 
 See [the documentation by the Docker image provider](https://github.com/LuckyTurtleDev/docker-images/blob/main/dockerfiles/anki/README.md) for a complete list of the server's config options that you could put in `anki_environment_variables_additional_variables`.
 
+### Self-building the container image
+
+Self-building the container image (`anki_container_image_self_build: true`) does not work, and the role refuses to run with it enabled rather than deploying a container which cannot start.
+
+The image built from [`docs/syncserver/Dockerfile`](https://github.com/ankitects/anki/blob/main/docs/syncserver/Dockerfile) in the Anki repository has an entrypoint which must start as `root` — it creates a group and a user, chowns the data directory, and only then drops privileges via `su-exec` — and which force-exports `SYNC_BASE=/anki_data` and `SYNC_PORT=8080`, ignoring the role's environment file. This role runs the container as an unprivileged user with `--cap-drop=ALL --read-only`, where that entrypoint dies with `addgroup: permission denied (are you root?)` before the server ever starts.
+
 ## Installing
 
 After configuring the playbook, run the installation command of your playbook as below:

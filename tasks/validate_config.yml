@@ -28,6 +28,30 @@
     - anki_environment_variables_username
     - anki_environment_variables_password
 
+# The image built from `docs/syncserver/Dockerfile` in the Anki repository is
+# not a drop-in replacement for the pre-built one this role defaults to. Its
+# entrypoint starts as `root`, creates a group and a user, chowns the data
+# directory and only then drops privileges with `su-exec`; it also force-exports
+# `SYNC_BASE=/anki_data` and `SYNC_PORT=8080`, overriding whatever the role puts
+# in the environment file. None of that survives the hardened container this
+# role runs (`--user`, `--cap-drop=ALL`, `--read-only`), which was confirmed by
+# running that image with exactly the role's flags: it dies immediately with
+# `addgroup: permission denied (are you root?)`, before the server ever starts.
+- name: Fail if self-building of the Anki synchronization server container image is enabled
+  when: anki_container_image_self_build | bool
+  ansible.builtin.fail:
+    msg: >-
+      Self-building the Anki synchronization server container image
+      (`anki_container_image_self_build: true`) does not work and never produced
+      a running server. The image built from `docs/syncserver/Dockerfile` in the
+      Anki repository requires starting as `root` so that its entrypoint can
+      create a user and chown the data directory, and it insists on keeping its
+      collections in `/anki_data`, while this role runs the container as
+      `{{ anki_uid }}:{{ anki_gid }}` with `--cap-drop=ALL --read-only` and
+      mounts the data directory at `{{ anki_container_data_path }}`.
+      Please remove `anki_container_image_self_build` from your configuration
+      and use the pre-built image (`{{ anki_container_image }}`).
+
 - name: Run if Traefik is enabled
   when: anki_container_labels_traefik_enabled | bool
   block:
