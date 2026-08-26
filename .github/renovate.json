@@ -7,7 +7,7 @@
     "`versioning=loose` on the annotation in defaults/main.yml is what makes any of this reachable. The image carries Anki's own version numbers, which have two components until a release gets its first patch (26.05, 26.08) and three afterwards (26.08.1, 25.09.4). Under Renovate's default `docker` versioning a two-component pin only ever sees two-component tags: running Renovate against this repository reported no updates whatsoever for `26.08` while 26.08.1 was already published, and offered `26.05` only `26.08`. With loose versioning the same lookup reports `26.08` -> `26.08.1` as the patch update it is."
   ],
   "extends": [
-    "github>mother-of-all-self-hosting/renovate-config#v1.0.0",
-    "github>mother-of-all-self-hosting/renovate-config//patch-automerge#v1.0.0"
+    "github>mother-of-all-self-hosting/renovate-config#v1.1.0",
+    "github>mother-of-all-self-hosting/renovate-config//patch-automerge#v1.1.0"
   ]
 }
