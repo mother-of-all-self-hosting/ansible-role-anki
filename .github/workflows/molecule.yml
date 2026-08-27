@@ -42,10 +42,8 @@ jobs:
         include:
           - scenario: default
             distro: ubuntu2604
-          - scenario: default
-            distro: debian13
           - scenario: upgrade
-            distro: debian13
+            distro: ubuntu2604
       fail-fast: false
 
     env:
