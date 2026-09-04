@@ -14,14 +14,13 @@
     anki_probe_base_url: "http://127.0.0.1:{{ anki_container_http_port }}"
 
   tasks:
-    # Read the version the role pins, rather than restating it here, so that a
-    # bump of `anki_version` cannot leave this assertion checking a stale value.
-    # Only leaf literals can be read this way; everything derived from them
-    # (`anki_container_image` and friends) is Jinja and would fail on access.
-    - name: Read Anki synchronization server role defaults
+    # The role is not included in this playbook, so its defaults are not in
+    # scope. Reading defaults/main.yml directly ties the version assertion
+    # below.
+    - name: Load the role defaults
       ansible.builtin.include_vars:
-        file: "{{ lookup('ansible.builtin.env', 'MOLECULE_PROJECT_DIRECTORY') }}/defaults/main.yml"
-        name: anki_role_defaults
+        file: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}/defaults/main.yml"
+        name: anki_defaults
 
     - name: Wait for the Anki synchronization server systemd service to become active (up to 180s)
       ansible.builtin.systemd:
@@ -60,7 +59,7 @@
         fail_msg: "Expected the container to run {{ expected_image }}, found {{ anki_container_image_result.stdout | trim }}"
         success_msg: "The container runs {{ expected_image }}"
       vars:
-        expected_image: "ghcr.io/luckyturtledev/anki:{{ anki_role_defaults.anki_version }}"
+        expected_image: "ghcr.io/luckyturtledev/anki:{{ anki_defaults.anki_version }}"
 
     # Retried like the lookup above: a container which cannot start is recreated
     # every 30 seconds and is absent in between, and this should report what is
