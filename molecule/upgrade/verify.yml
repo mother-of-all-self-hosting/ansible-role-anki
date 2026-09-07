@@ -14,18 +14,21 @@
     anki_downgrade_container_name: anki-upgrade-scenario-downgrade-check
 
   tasks:
-    - name: Read Anki synchronization server role defaults
+    # The role is not included in this playbook, so its defaults are not in
+    # scope. Reading defaults/main.yml directly ties the version assertion
+    # below.
+    - name: Load the role defaults
       ansible.builtin.include_vars:
-        file: "{{ lookup('ansible.builtin.env', 'MOLECULE_PROJECT_DIRECTORY') }}/defaults/main.yml"
-        name: anki_role_defaults
+        file: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}/defaults/main.yml"
+        name: anki_defaults
 
     # Should the pinned version ever become the seed version, this scenario
     # would quietly stop testing an upgrade at all.
     - name: Assert the seed release differs from the pinned release
       ansible.builtin.assert:
-        that: anki_molecule_seed_version != anki_role_defaults.anki_version
-        fail_msg: "The seed release and the pinned release are both {{ anki_role_defaults.anki_version }}, so no upgrade is being exercised"
-        success_msg: "Upgrading from {{ anki_molecule_seed_version }} to {{ anki_role_defaults.anki_version }}"
+        that: anki_molecule_seed_version != anki_defaults.anki_version
+        fail_msg: "The seed release and the pinned release are both {{ anki_defaults.anki_version }}, so no upgrade is being exercised"
+        success_msg: "Upgrading from {{ anki_molecule_seed_version }} to {{ anki_defaults.anki_version }}"
 
     - name: Read what the seed release of Anki synchronization server reported
       ansible.builtin.slurp:
@@ -51,7 +54,7 @@
         fail_msg: "Expected the container to run {{ expected_image }}, found {{ anki_container_image_result.stdout | trim }}"
         success_msg: "The container runs {{ expected_image }}"
       vars:
-        expected_image: "ghcr.io/luckyturtledev/anki:{{ anki_role_defaults.anki_version }}"
+        expected_image: "ghcr.io/luckyturtledev/anki:{{ anki_defaults.anki_version }}"
 
     # As in the `default` scenario, readiness is only that the server answers,
     # so that the assertions below fail at their own tasks.
@@ -76,7 +79,7 @@
       ansible.builtin.debug:
         msg:
           - "seed ({{ anki_molecule_seed_version }}): {{ anki_seed_probe }}"
-          - "pinned ({{ anki_role_defaults.anki_version }}): {{ anki_probe }}"
+          - "pinned ({{ anki_defaults.anki_version }}): {{ anki_probe }}"
 
     - name: Assert the upgraded Anki synchronization server still serves the existing collection
       ansible.builtin.assert:
