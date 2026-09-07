@@ -23,16 +23,19 @@
         name: anki_defaults
 
     - name: Wait for the Anki synchronization server systemd service to become active (up to 180s)
-      ansible.builtin.systemd:
+      ansible.builtin.systemd_service:
         name: anki.service
       register: anki_service
       until: anki_service.status.ActiveState == 'active'
       retries: 36
       delay: 5
+      # So that giving up is reported by the assertion below rather than as a
+      # wall of systemd unit properties.
+      failed_when: false
 
-    # `Restart=always` keeps a crash-looping container's unit "active", so this
-    # says little on its own - it is here to fail fast and readably when the
-    # unit was never installed or enabled at all.
+    # `Restart=always` in the systemd unit means that even a container which crashes
+    # and gets restarted reads as active here, so this is a precondition rather than
+    # a result.
     - name: Assert the Anki synchronization server systemd service is active
       ansible.builtin.assert:
         that: anki_service.status.ActiveState == 'active'
@@ -174,7 +177,7 @@
         fail_msg: "No SQLite collection at {{ anki_data_path }}/{{ anki_environment_variables_username }}/collection.anki2"
         success_msg: "The collection of {{ anki_environment_variables_username }} is an SQLite database under {{ anki_data_path }}"
 
-    - name: Retrieve the Anki synchronization server service log for debugging
+    - name: Retrieve the Anki synchronization server systemd service log for debugging
       when: anki_debug_service_enabled | bool
       ansible.builtin.command:
         cmd: journalctl -xeu anki.service
