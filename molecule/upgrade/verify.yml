@@ -177,5 +177,5 @@
     - name: Retrieve the Anki synchronization server systemd service log for debugging
       when: anki_debug_service_enabled | bool
       ansible.builtin.command:
-        cmd: journalctl -xeu anki.service
+        cmd: journalctl --no-pager --output=cat --unit=anki.service
       changed_when: false
