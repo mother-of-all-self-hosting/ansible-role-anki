@@ -14,6 +14,8 @@
     anki_probe_base_url: "http://127.0.0.1:{{ anki_container_http_port }}"
 
   tasks:
+    - name: Verify that Anki synchronization server works
+      block:
     # The role is not included in this playbook, so its defaults are not in
     # scope. Reading defaults/main.yml directly ties the version assertion
     # below.
@@ -182,3 +184,19 @@
       ansible.builtin.command:
         cmd: journalctl --no-pager --output=cat --unit=anki.service
       changed_when: false
+
+      rescue:
+        # Whatever went wrong, the reason is almost always in the systemd service log.
+        - name: Retrieve the Anki synchronization server systemd service log
+          ansible.builtin.command:
+            cmd: journalctl --no-pager --output=cat --unit=anki.service
+          register: anki_service_log
+          changed_when: false
+
+        - name: Show the Anki synchronization server systemd service log
+          ansible.builtin.debug:
+            var: anki_service_log.stdout_lines
+
+        - name: Fail because verification did not pass
+          ansible.builtin.fail:
+            msg: "Anki synchronization server verification failed. The systemd service log is printed above."
