@@ -12,6 +12,8 @@
 
   vars:
     anki_probe_base_url: "http://127.0.0.1:{{ anki_container_http_port }}"
+    anki_verify_units:
+      - anki.service
 
   tasks:
     - name: Verify that Anki synchronization server works
@@ -24,13 +26,14 @@
             file: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}/defaults/main.yml"
             name: anki_defaults
 
-        - name: Wait for the Anki synchronization server systemd service to become active (up to 180s)
+        - name: Wait for the Anki synchronization server systemd services to become active (up to 180s each)
           ansible.builtin.systemd_service:
-            name: anki.service
-          register: anki_service
-          until: anki_service.status.ActiveState == 'active'
+            name: "{{ item }}"
+          register: anki_services
+          until: anki_services.status.ActiveState == 'active'
           retries: 36
           delay: 5
+          loop: "{{ anki_verify_units }}"
           # So that giving up is reported by the assertion below rather than as a
           # wall of systemd unit properties.
           failed_when: false
@@ -38,11 +41,20 @@
         # `Restart=always` in the systemd unit means that even a container which crashes
         # and gets restarted reads as active here, so this is a precondition rather than
         # a result.
-        - name: Assert the Anki synchronization server systemd service is active
+        - name: Assert the Anki synchronization server systemd services are active
           ansible.builtin.assert:
-            that: anki_service.status.ActiveState == 'active'
-            fail_msg: "anki.service is not active ({{ anki_service.status.ActiveState }})"
-            success_msg: "anki.service is active"
+            that: anki_services.results | map(attribute='status.ActiveState') | unique | list == ['active']
+            fail_msg: >-
+              Not every service is active:
+              {{ dict(anki_verify_units | zip(anki_services.results | map(attribute='status.ActiveState'))) }}
+            success_msg: "Every systemd service is active"
+
+        - name: Retrieve the Anki synchronization server systemd services log for debugging
+          when: anki_debug_service_enabled | bool
+          ansible.builtin.command:
+            cmd: "journalctl --no-pager --output=cat --unit={{ item }}"
+          changed_when: false
+          loop: "{{ anki_verify_units }}"
 
         - name: Retrieve the Anki synchronization server container's image reference
           ansible.builtin.command:
