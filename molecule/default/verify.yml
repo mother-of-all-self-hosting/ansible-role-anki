@@ -153,7 +153,7 @@
               - anki_probe.meta.scm | int > 0
               - anki_probe.meta.cont
               - anki_probe.forged_key_status == 403
-            fail_msg: "sync/meta returned {{ anki_probe.meta_status }} ({{ anki_probe.meta | default('no body') }}), and {{ anki_probe.forged_key_status }} for a forged key"
+            fail_msg: "sync/meta returned {{ anki_probe.meta_status }} ({{ anki_probe.meta | default('no response') }}), and {{ anki_probe.forged_key_status }} for a forged key"
             success_msg: "sync/meta returned collection metadata and rejects a forged key"
 
         # `/health` answers 200 with an empty body on any instance, configured or
