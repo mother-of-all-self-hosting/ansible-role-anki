@@ -31,6 +31,7 @@ provisioner:
       all:
         # Helper variables
         anki_debug_service_enabled: false
+        anki_restarts_check_enabled: true
 
         # An arbitrary directory mounted into the container next to the data
         # directory. Its only purpose is to make this scenario configure
