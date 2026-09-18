@@ -81,7 +81,7 @@ Take a look at:
 
 - [`defaults/main.yml`](../defaults/main.yml) for some variables that you can customize via your `vars.yml` file. You can override settings (even those that don't have dedicated playbook variables) using the `anki_environment_variables_additional_variables` variable
 
-See [the documentation by the Docker image provider](https://github.com/LuckyTurtleDev/docker-images/blob/main/dockerfiles/anki/README.md) for a complete list of the server's config options that you could put in `anki_environment_variables_additional_variables`.
+See [the documentation by the Docker image provider](https://github.com/LuckyTurtleDev/docker-images/blob/main/dockerfiles/anki/README.md) for a complete list of the server's config options that you can put in `anki_environment_variables_additional_variables`.
 
 ### Self-building the container image
 
