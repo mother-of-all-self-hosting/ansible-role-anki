@@ -28,7 +28,7 @@ See the project's [documentation](https://docs.ankiweb.net/sync-server.html) to 
 
 >[!NOTE]
 >
-> This role is configured to use [this pre-built Docker image](https://github.com/luckyturtledev/docker-images/pkgs/container/anki) by default. While the image itself is unofficial, it contains the official synchronization server. See [Dockerfile](https://github.com/LuckyTurtleDev/docker-images/blob/main/dockerfiles/anki/Dockerfile) by the author and [this summary](https://github.com/truecharts/public/issues/17318#issue-2092096085) for (a bit complicated) history behind the Docker image.
+> This role is configured to use [this pre-built Docker image](https://github.com/luckyturtledev/docker-images/pkgs/container/anki) by default. While the image itself is unofficial, it contains the official synchronization server. Refer to [Dockerfile](https://github.com/LuckyTurtleDev/docker-images/blob/main/dockerfiles/anki/Dockerfile) by the author and [this summary](https://github.com/truecharts/public/issues/17318#issue-2092096085) for (a bit complicated) history behind the Docker image.
 
 ## Adjusting the playbook configuration
 
@@ -81,7 +81,7 @@ Take a look at:
 
 - [`defaults/main.yml`](../defaults/main.yml) for some variables that you can customize via your `vars.yml` file. You can override settings (even those that don't have dedicated playbook variables) using the `anki_environment_variables_additional_variables` variable
 
-See [the documentation by the Docker image provider](https://github.com/LuckyTurtleDev/docker-images/blob/main/dockerfiles/anki/README.md) for a complete list of the server's config options that you can put in `anki_environment_variables_additional_variables`.
+Refer to [the documentation by the Docker image provider](https://github.com/LuckyTurtleDev/docker-images/blob/main/dockerfiles/anki/README.md) for a complete list of the server's config options that you can put in `anki_environment_variables_additional_variables`.
 
 ### Self-building the container image
 
@@ -103,7 +103,7 @@ If you use the MASH playbook, the shortcut commands with the [`just` program](ht
 
 After running the command for installation, the synchronization server becomes available at the specified hostname like `https://example.com`.
 
-If using a reverse proxy to provide HTTPS access and serving the instance under a subpath, make sure to include a trailing slash when configuring Anki. See [this section on the official documentation](https://docs.ankiweb.net/sync-server.html#reverse-proxies) for details.
+If using a reverse proxy to provide HTTPS access and serving the instance under a subpath, make sure to include a trailing slash when configuring Anki. Refer to [this section on the official documentation](https://docs.ankiweb.net/sync-server.html#reverse-proxies) for details.
 
 ## Troubleshooting
 
