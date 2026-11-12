@@ -20,6 +20,8 @@ Check [`defaults/main.yml`](defaults/main.yml) for the full list of supported op
 
 ## Development
 
+Please refer to [this page](https://github.com/mother-of-all-self-hosting/mash-playbook/blob/main/docs/developer-documentation.md) on the MASH playbook for general guidelines about development.
+
 ### Collaborating on Radicle
 
 The role can be cloned from the [Radicle](https://radicle.dev) network, a peer-to-peer code collaboration stack built on Git. Please follow [this "Getting Started" guide](https://radicle.dev/guides/quick-start) on the official documentation for the basic installation and usage of the Radicle toolchain.
